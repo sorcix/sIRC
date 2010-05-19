@@ -108,13 +108,13 @@ public abstract class IrcAdaptor implements ServerListener, MessageListener, Mod
 	public void onOp(final IrcConnection irc, final Channel channel, final User sender, final User user) {}
 	
 	@Override
-	public void onPart(final IrcConnection irc, final Channel channel, final User user) {}
+	public void onPart(final IrcConnection irc, final Channel channel, final User user, String message) {}
 	
 	@Override
 	public void onPrivateMessage(final IrcConnection irc, final User sender, final String message) {}
 	
 	@Override
-	public void onQuit(final IrcConnection irc, final User user) {}
+	public void onQuit(final IrcConnection irc, final User user, String message) {}
 	
 	@Override
 	public void onTopic(final IrcConnection irc, final Channel channel, final User sender, final String topic) {}
