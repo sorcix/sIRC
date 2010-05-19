@@ -133,16 +133,18 @@ public interface ServerListener {
 	 * @param irc The {@link IrcConnection} receiving this event.
 	 * @param channel The channel someone parted from.
 	 * @param user The user who parted.
+	 * @param message The part message, or {@code null}.
 	 */
-	void onPart(IrcConnection irc, Channel channel, User user);
+	void onPart(IrcConnection irc, Channel channel, User user, String message);
 	
 	/**
 	 * Someone quit the IRC server.
 	 * 
 	 * @param irc The {@link IrcConnection} receiving this event.
 	 * @param user The user who quit.
+	 * @param message The quit message, or {@code null}.
 	 */
-	void onQuit(IrcConnection irc, User user);
+	void onQuit(IrcConnection irc, User user, String message);
 	
 	/**
 	 * Someone (possibly us) changed the topic of a channel, or we
