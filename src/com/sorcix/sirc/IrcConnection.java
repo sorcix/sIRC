@@ -300,23 +300,6 @@ public final class IrcConnection {
 	}
 	
 	/**
-	 * Connect to the IRC server with given nickname.
-	 * 
-	 * @param nick Nick to use.
-	 * @throws UnknownHostException When the domain name is invalid.
-	 * @throws IOException When anything went wrong while connecting.
-	 * @throws NickNameException If the given nickname is already in
-	 *             use or invalid.
-	 * @deprecated This method has been replaced by {@link #connect()}
-	 *             .
-	 */
-	@Deprecated
-	public void connect(final String nick) throws UnknownHostException, IOException, NickNameException {
-		this.setNick(nick);
-		this.connect();
-	}
-	
-	/**
 	 * Creates a {@link Channel} object with given channel name. Note
 	 * that this method does not actually create a channel on the IRC
 	 * server, it just creates a {@link Channel} object linked to this
