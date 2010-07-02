@@ -333,16 +333,18 @@ final class IrcParser {
 			case IrcDecoder.RPL_NAMREPLY:
 				final String[] arguments = line.getArgumentsArray();
 				final Channel channel = irc.getState().getChannel(arguments[arguments.length - 1]);
-				final String[] users = line.getMessage().split(" ");
-				User buffer;
-				for (final String user : users) {
-					buffer = new User(user, irc);
-					/*
-					 * if (channel.hasUser(buffer)) {
-					 * channel.addUser(buffer); }
-					 * channel.addUser(buffer);
-					 */
-					channel.updateUser(buffer, true);
+				if (channel != null) {
+					final String[] users = line.getMessage().split(" ");
+					User buffer;
+					for (final String user : users) {
+						buffer = new User(user, irc);
+						/*
+						 * if (channel.hasUser(buffer)) {
+						 * channel.addUser(buffer); }
+						 * channel.addUser(buffer);
+						 */
+						channel.updateUser(buffer, true);
+					}
 				}
 				break;
 			case IrcDecoder.RPL_MOTD:
