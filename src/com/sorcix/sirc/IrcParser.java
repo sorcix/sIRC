@@ -173,16 +173,17 @@ final class IrcParser {
 			// someone was kicked from a channel
 			final String[] data = line.getArgumentsArray();
 			final User kicked = new User(data[1], irc);
+			final Channel channel = irc.getState().getChannel(data[0]);
 			if (kicked.isUs()) {
 				// if the user leaving the channel is the client
 				// we need to remove it from the channel list
 				irc.getState().removeChannel(data[0]);
 			} else {
 				// remove user from channel list.
-				irc.getState().getChannel(data[0]).removeUser(kicked);
+				channel.removeUser(kicked);
 			}
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
-				it.next().onKick(irc, irc.getState().getChannel(data[0]), line.getSenderUser(), kicked);
+				it.next().onKick(irc, channel, line.getSenderUser(), kicked);
 			}
 			return;
 		} else if (line.getCommand().equals("MODE")) {
