@@ -38,7 +38,7 @@ import java.util.Map;
  * @since 1.1.0
  */
 public final class ClientState {
-	
+
 	// TODO: Allow changing the username (sIRC@..)
 	/** The list of channels. */
 	private final Map<String, Channel> channels;
