@@ -217,8 +217,12 @@ final class IrcParser {
 			return;
 		} else if (line.getCommand().equals("INVITE")) {
 			// someone was invited
-			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
-				it.next().onInvite(irc, line.getSenderUser(), new User(line.getArguments(), irc), irc.getState().getChannel(line.getMessage()));
+			final String[] args = line.getArgumentsArray();
+			if ((args.length >= 2) && (line.getMessage() == null)) {
+				final Channel channel = irc.createChannel(args[1]);
+				for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
+					it.next().onInvite(irc, line.getSenderUser(), new User(args[0], irc), channel);
+				}
 			}
 			return;
 		} else {
