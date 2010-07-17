@@ -338,12 +338,38 @@ public final class User {
 	public void setCustomAddress(final String address) {
 		if (address == null) {
 			this.address = this.getNick();
-		}
-		if (address.startsWith("@")) {
+		} else if (address.startsWith("@")) {
 			this.address = this.getNick() + address;
 		} else {
 			this.address = address;
 		}
+	}
+	
+	/**
+	 * Changes a user mode for given user.
+	 * 
+	 * @param mode The mode character.
+	 * @param toggle True to enable the mode, false to disable.
+	 */
+	public void setMode(final char mode, final boolean toggle) {
+		if (toggle) {
+			this.setMode("+" + mode);
+		} else {
+			this.setMode("-" + mode);
+		}
+	}
+	
+	/**
+	 * Changes a user mode. The address is automatically added.
+	 * 
+	 * <pre>
+	 * setMode(&quot;+m&quot;);
+	 * </pre>
+	 * 
+	 * @param mode The mode to change.
+	 */
+	public void setMode(final String mode) {
+		this.irc.getOutput().send("MODE " + this.getAddress() + " " + mode);
 	}
 	
 	/**
@@ -358,6 +384,13 @@ public final class User {
 		}
 		this.nick = nick;
 		this.nickLower = nick.toLowerCase();
+		// TODO: Check whether addresses like nick!user@server are
+		// allowed
+		if ((this.address != null) && this.address.contains("@")) {
+			this.address = this.nick + "@" + this.address.split("@", 2)[1];
+		} else {
+			this.address = this.nick;
+		}
 	}
 	
 	@Override
