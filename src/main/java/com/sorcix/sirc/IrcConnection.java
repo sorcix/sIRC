@@ -49,7 +49,7 @@ import javax.net.ssl.SSLSocketFactory;
  * 
  * @author Sorcix
  */
-public final class IrcConnection {
+public class IrcConnection {
 	
 	/** The sIRC about string, used in CTCP */
 	public static final String ABOUT = "Sorcix Lib-IRC (sIRC) v" + IrcConnection.VERSION;

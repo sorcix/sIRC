@@ -36,7 +36,7 @@ import java.io.Writer;
  * 
  * @author Sorcix
  */
-final class IrcOutput extends Thread {
+class IrcOutput extends Thread {
 	
 	/** The IrcConnection. */
 	private final IrcConnection irc;
