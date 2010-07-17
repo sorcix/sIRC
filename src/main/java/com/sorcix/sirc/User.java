@@ -44,6 +44,8 @@ public final class User {
 	private String nickLower;
 	/** The prefix. */
 	private char prefix;
+	/** Custom address to send messages to. */
+	private String address = null;
 	/** Username of this user (or null if unknown). */
 	private final String userName;
 	/** Mode character for voice. */
@@ -94,6 +96,7 @@ public final class User {
 		this.userName = user;
 		this.hostName = host;
 		this.irc = irc;
+		this.address = this.getNick();
 	}
 	
 	@Override
@@ -103,6 +106,10 @@ public final class User {
 		} catch (final Exception ex) {
 			return false;
 		}
+	}
+	
+	private String getAddress() {
+		return this.address;
 	}
 	
 	/**
@@ -237,7 +244,7 @@ public final class User {
 	 * @param command Command to send.
 	 */
 	private void sendCtcp(final String command) {
-		this.irc.getOutput().send("PRIVMSG " + this.getNick() + " :" + IrcDecoder.CTCP + command + IrcDecoder.CTCP);
+		this.irc.getOutput().send("PRIVMSG " + this.getAddress() + " :" + IrcDecoder.CTCP + command + IrcDecoder.CTCP);
 	}
 	
 	/**
@@ -289,9 +296,9 @@ public final class User {
 	 */
 	protected void sendCtcpReply(final String command, final boolean skipQueue) {
 		if (skipQueue) {
-			this.irc.getOutput().sendNow("NOTICE " + this.getNick() + " :" + IrcDecoder.CTCP + command + IrcDecoder.CTCP);
+			this.irc.getOutput().sendNow("NOTICE " + this.getAddress() + " :" + IrcDecoder.CTCP + command + IrcDecoder.CTCP);
 		} else {
-			this.irc.getOutput().send("NOTICE " + this.getNick() + " :" + IrcDecoder.CTCP + command + IrcDecoder.CTCP);
+			this.irc.getOutput().send("NOTICE " + this.getAddress() + " :" + IrcDecoder.CTCP + command + IrcDecoder.CTCP);
 		}
 	}
 	
@@ -308,7 +315,7 @@ public final class User {
 	 * @param message The message to send.
 	 */
 	public void sendMessage(final String message) {
-		this.irc.getOutput().send("PRIVMSG " + this.getNick() + " :" + message);
+		this.irc.getOutput().send("PRIVMSG " + this.getAddress() + " :" + message);
 	}
 	
 	/**
@@ -317,7 +324,52 @@ public final class User {
 	 * @param message The notice to send.
 	 */
 	public void sendNotice(final String message) {
-		this.irc.getOutput().send("NOTICE " + this.getNick() + " :" + message);
+		this.irc.getOutput().send("NOTICE " + this.getAddress() + " :" + message);
+	}
+	
+	/**
+	 * Sets a custom address for this user. This address will be used
+	 * to send messages to instead of simply the nickname. Use an
+	 * address like {@code nick@server}. Setting the address to
+	 * {@code @server} will prepend the nick automatically.
+	 * 
+	 * @param address The address to use.
+	 */
+	public void setCustomAddress(final String address) {
+		if (address == null) {
+			this.address = this.getNick();
+		} else if (address.startsWith("@")) {
+			this.address = this.getNick() + address;
+		} else {
+			this.address = address;
+		}
+	}
+	
+	/**
+	 * Changes a user mode for given user.
+	 * 
+	 * @param mode The mode character.
+	 * @param toggle True to enable the mode, false to disable.
+	 */
+	public void setMode(final char mode, final boolean toggle) {
+		if (toggle) {
+			this.setMode("+" + mode);
+		} else {
+			this.setMode("-" + mode);
+		}
+	}
+	
+	/**
+	 * Changes a user mode. The address is automatically added.
+	 * 
+	 * <pre>
+	 * setMode(&quot;+m&quot;);
+	 * </pre>
+	 * 
+	 * @param mode The mode to change.
+	 */
+	public void setMode(final String mode) {
+		this.irc.getOutput().send("MODE " + this.getAddress() + " " + mode);
 	}
 	
 	/**
@@ -332,6 +384,13 @@ public final class User {
 		}
 		this.nick = nick;
 		this.nickLower = nick.toLowerCase();
+		// TODO: Check whether addresses like nick!user@server are
+		// allowed
+		if ((this.address != null) && this.address.contains("@")) {
+			this.address = this.nick + "@" + this.address.split("@", 2)[1];
+		} else {
+			this.address = this.nick;
+		}
 	}
 	
 	@Override
