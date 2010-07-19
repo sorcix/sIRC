@@ -108,6 +108,10 @@ public final class User {
 		}
 	}
 	
+	/**
+	 * Returns the address sIRC uses to send messages to this user.
+	 * @return The address used to send messages to this user.
+	 */
 	private String getAddress() {
 		return this.address;
 	}
@@ -403,5 +407,7 @@ public final class User {
 	 * 
 	 * @param user The fresh User object.
 	 */
-	protected void updateUser(final User user) {}
+	protected void updateUser(final User user) {
+		//TODO: Unfinished method?
+	}
 }
