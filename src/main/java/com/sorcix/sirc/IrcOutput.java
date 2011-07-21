@@ -96,11 +96,27 @@ class IrcOutput extends Thread {
 	}
 	
 	/**
+	 * Sends {@link IrcPacket} to the IRC server, using the message queue.
+	 * 
+	 * @param packet The data to send.
+	 */
+	protected synchronized void send(final IrcPacket packet) {
+		if (this.irc.getMessageDelay() == 0) {
+			this.sendNow(packet.getRaw());
+			return;
+		}
+		this.queue.add(packet.getRaw());
+	}
+	
+	/**
 	 * Sends raw line to the IRC server, using the message queue.
 	 * 
 	 * @param line The raw line to send.
+	 * @deprecated Use {@link #send(IrcPacket)} instead.
 	 */
+	@Deprecated
 	protected synchronized void send(final String line) {
+		//TODO: Remove in a future release.
 		if (this.irc.getMessageDelay() == 0) {
 			this.sendNow(line);
 			return;
@@ -109,18 +125,48 @@ class IrcOutput extends Thread {
 	}
 	
 	/**
+	 * Sends {@link IrcPacket} to the IRC server, without using the message
+	 * queue. This method will ignore any exceptions thrown while
+	 * sending the message.
+	 * 
+	 * @param line The data to send.
+	 */
+	protected synchronized void sendNow(final IrcPacket packet) {
+		try {
+			this.sendNowEx(packet.getRaw());
+		} catch (final Exception ex) {
+			// ignore
+		}
+	}
+	
+	/**
 	 * Sends raw line to the IRC server, without using the message
 	 * queue. This method will ignore any exceptions thrown while
 	 * sending the message.
 	 * 
 	 * @param line The raw line to send.
+	 * @deprecated Use {@link #sendNow(IrcPacket)} instead.
 	 */
+	@Deprecated
 	protected synchronized void sendNow(final String line) {
+		//TODO: Remove in a future release.
 		try {
 			this.sendNowEx(line);
 		} catch (final Exception ex) {
 			// ignore
 		}
+	}
+	
+	/**
+	 * Sends {@link IrcPacket} to the IRC server, without using the message
+	 * queue.
+	 * 
+	 * @param line The raw line to send.
+	 * @throws IOException If anything goes wrong while sending this
+	 *             message.
+	 */
+	protected synchronized void sendNowEx(final IrcPacket packet) throws IOException {
+		this.sendNowEx(packet.getRaw());
 	}
 	
 	/**
@@ -131,12 +177,24 @@ class IrcOutput extends Thread {
 	 * @throws IOException If anything goes wrong while sending this
 	 *             message.
 	 */
-	protected synchronized void sendNowEx(String line) throws IOException {
+	private synchronized void sendNowEx(String line) throws IOException {
 		if (line.length() > IrcOutput.MAX_LINE_LENGTH - 2) {
 			line = line.substring(0, IrcOutput.MAX_LINE_LENGTH - 2);
 		}
 		IrcDebug.log(">>> " + line);
 		this.out.write(line + IrcConnection.ENDLINE);
 		this.out.flush();
+	}
+
+	/**
+	 * Shortcut to quickly send a PONG packet back.
+	 * @param code The code to send with the PONG packet.
+	 */
+	protected void pong(String code) {
+		try {
+			this.sendNowEx("PONG "+code);
+		} catch (final Exception ex) {
+			// ignore
+		}
 	}
 }

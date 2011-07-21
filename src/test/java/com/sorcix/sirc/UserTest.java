@@ -24,7 +24,7 @@ public class UserTest {
         final User user = new User("a", connection);
         user.sendAction("hello");
 
-        verify(ircOutput).send("PRIVMSG a :" + IrcDecoder.CTCP + "ACTION hello" + IrcDecoder.CTCP);
+        verify(ircOutput).send("PRIVMSG a :" + IrcPacket.CTCP + "ACTION hello" + IrcPacket.CTCP);
     }
 
     @Test
@@ -34,7 +34,7 @@ public class UserTest {
         final User user = new User("b", connection);
         user.sendAction(" hello ");
 
-        verify(ircOutput).send("PRIVMSG b :" + IrcDecoder.CTCP + "ACTION  hello " + IrcDecoder.CTCP);
+        verify(ircOutput).send("PRIVMSG b :" + IrcPacket.CTCP + "ACTION  hello " + IrcPacket.CTCP);
     }
 
     @Test
@@ -44,7 +44,7 @@ public class UserTest {
         final User user = new User("c", connection);
         user.sendAction(":");
 
-        verify(ircOutput).send("PRIVMSG c :" + IrcDecoder.CTCP + "ACTION :" + IrcDecoder.CTCP);
+        verify(ircOutput).send("PRIVMSG c :" + IrcPacket.CTCP + "ACTION :" + IrcPacket.CTCP);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class UserTest {
         final User user = new User("a", connection);
         user.sendCtcpPing();
 
-        verify(ircOutput).send(matches("PRIVMSG a :" + IrcDecoder.CTCP + "PING \\d+" + IrcDecoder.CTCP));
+        verify(ircOutput).send(matches("PRIVMSG a :" + IrcPacket.CTCP + "PING \\d+" + IrcPacket.CTCP));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class UserTest {
         final User user = new User("a", connection);
         user.sendCtcpVersion();
 
-        verify(ircOutput).send("PRIVMSG a :" + IrcDecoder.CTCP + "VERSION" + IrcDecoder.CTCP);
+        verify(ircOutput).send("PRIVMSG a :" + IrcPacket.CTCP + "VERSION" + IrcPacket.CTCP);
     }
 
     @Test

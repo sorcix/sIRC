@@ -47,7 +47,7 @@ public interface AdvancedListener {
 	 * @param irc The {@link IrcConnection} receiving this event.
 	 * @param line The incoming line.
 	 */
-	void onUnknown(IrcConnection irc, IrcDecoder line);
+	void onUnknown(IrcConnection irc, IrcPacket line);
 	
 	/**
 	 * Received an unknown numeric server reply.
@@ -55,5 +55,5 @@ public interface AdvancedListener {
 	 * @param irc The {@link IrcConnection} receiving this event.
 	 * @param line The incoming line.
 	 */
-	void onUnknownReply(IrcConnection irc, IrcDecoder line);
+	void onUnknownReply(IrcConnection irc, IrcPacket line);
 }

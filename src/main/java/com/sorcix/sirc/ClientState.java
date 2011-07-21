@@ -134,6 +134,7 @@ public final class ClientState {
 	 *         object for this user.
 	 */
 	protected User getUser(final String nick) {
+		//TODO: implement singleton users in User, Channel and IrcConnection
 		if (this.users.containsKey(nick)) {
 			return this.users.get(nick);
 		}
