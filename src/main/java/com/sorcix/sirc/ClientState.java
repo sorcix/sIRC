@@ -42,45 +42,63 @@ public final class ClientState {
 	// TODO: Allow changing the username (sIRC@..)
 	/** The list of channels. */
 	private final Map<String, Channel> channels;
+	/** Contains a singleton for all known users. */
+	private final Map<String, User> users;
 	/** The local user. */
 	private User client;
-	
+
 	/**
 	 * Creates a new ClientState.
 	 */
 	protected ClientState() {
 		this.channels = new HashMap<String, Channel>();
+		this.users = new HashMap<String, User>();
 	}
-	
+
 	/**
-	 * Adds a channel to the channel list.
+	 * Adds a channel to the channel map.
 	 * 
-	 * @param channel The channel to add.
+	 * @param channel
+	 *            The channel to add.
 	 */
 	protected void addChannel(final Channel channel) {
 		if (!this.channels.containsKey(channel.getName())) {
 			this.channels.put(channel.getName(), channel);
 		}
 	}
-	
+
 	/**
-	 * Retrieves a shared channel object from the channel list.
+	 * Adds a user to the user map.
 	 * 
-	 * @param channel A channel object representing this channel.
-	 * @return The channel, or null if this channel doesn't exist.
-	 *         (The local user is not in that channel)
+	 * @param user
+	 *            The user to add.
+	 */
+	protected void addUser(final User user) {
+		if (!this.users.containsKey(user.getNickLower())) {
+			this.users.put(user.getNickLower(), user);
+		}
+	}
+
+	/**
+	 * Retrieves a shared channel object from the channel map.
+	 * 
+	 * @param channel
+	 *            A channel object representing this channel.
+	 * @return The channel, or null if this channel doesn't exist. (The local
+	 *         user is not in that channel)
 	 * @see #getChannel(String)
 	 */
 	protected Channel getChannel(final Channel channel) {
 		return this.getChannel(channel.getName());
 	}
-	
+
 	/**
-	 * Retrieves a shared channel object from the channel list.
+	 * Retrieves a shared channel object from the channel map.
 	 * 
-	 * @param channel The channel name.
-	 * @return The channel, or null if this channel doesn't exist.
-	 *         (The local user is not in that channel)
+	 * @param channel
+	 *            The channel name.
+	 * @return The channel, or null if this channel doesn't exist. (The local
+	 *         user is not in that channel)
 	 */
 	protected Channel getChannel(final String channel) {
 		if (this.channels.containsKey(channel)) {
@@ -88,7 +106,7 @@ public final class ClientState {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Creates an iterator through all Channels.
 	 * 
@@ -97,7 +115,7 @@ public final class ClientState {
 	public Iterator<Channel> getChannels() {
 		return this.channels.values().iterator();
 	}
-	
+
 	/**
 	 * Retrieves the local {@link User}.
 	 * 
@@ -106,39 +124,57 @@ public final class ClientState {
 	public User getClient() {
 		return this.client;
 	}
-	
+
 	/**
-	 * Checks if given channel is in the channel list.
+	 * Retrieves a shared user object from the users map.
 	 * 
-	 * @param name The name of this channel.
+	 * @param nick
+	 *            The nickname of this user.
+	 * @return The shared user object, or null if there is no singleton User
+	 *         object for this user.
+	 */
+	protected User getUser(final String nick) {
+		if (this.users.containsKey(nick)) {
+			return this.users.get(nick);
+		}
+		return null;
+	}
+
+	/**
+	 * Checks if given channel is in the channel map.
+	 * 
+	 * @param name
+	 *            The name of this channel.
 	 * @return True if the channel is in the list, false otherwise.
 	 */
 	protected boolean hasChannel(final String name) {
 		return this.channels.containsKey(name);
 	}
-	
+
 	/**
-	 * Remove all channels from the channel list.
+	 * Remove all channels from the channel map.
 	 */
 	protected void removeAll() {
 		this.channels.clear();
 	}
-	
+
 	/**
-	 * Removes a channel from the channel list.
+	 * Removes a channel from the channel map.
 	 * 
-	 * @param channel The channel name.
+	 * @param channel
+	 *            The channel name.
 	 */
 	protected void removeChannel(final String channel) {
 		if (this.channels.containsKey(channel)) {
 			this.channels.remove(channel);
 		}
 	}
-	
+
 	/**
 	 * Set the local {@link User}.
 	 * 
-	 * @param user The local {@code User}.
+	 * @param user
+	 *            The local {@code User}.
 	 */
 	protected void setClient(final User user) {
 		this.client = user;
