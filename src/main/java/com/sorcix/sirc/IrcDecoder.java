@@ -127,8 +127,11 @@ public final class IrcDecoder {
 		if ((this.sender != null) && (this.sender.indexOf('!') > 0)) {
 			final String[] stuff = this.sender.split("@|!");
 			if (stuff.length == 3) {
-				this.senderUser = new User(stuff[0], stuff[1], stuff[2], irc);
-			}
+				this.senderUser = new User(stuff[0], stuff[1], stuff[2], null, irc);
+			} else if (stuff.length == 1)
+				this.senderUser = new User(this.sender, this.sender, this.sender, null, irc);
+		} else {
+			this.senderUser = new User(this.sender, this.sender, this.sender, null, irc);
 		}
 	}
 	

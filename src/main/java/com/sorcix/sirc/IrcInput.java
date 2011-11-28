@@ -52,7 +52,7 @@ final class IrcInput extends Thread {
 	 * @param in The stream to use for communication.
 	 */
 	protected IrcInput(final IrcConnection irc, final Reader in) {
-		this.setName("sIRC-IN");
+		this.setName("sIRC-IN:" + irc.getServerAddress() + "-" + irc.getClient().getUserName());
 		this.setPriority(Thread.NORM_PRIORITY);
 		this.setDaemon(false);
 		this.in = new BufferedReader(in);

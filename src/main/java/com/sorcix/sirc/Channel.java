@@ -109,10 +109,15 @@ public final class Channel {
 	@Override
 	public boolean equals(final Object channel) {
 		try {
-			return ((Channel) channel).getName().equalsIgnoreCase(this.name);
+			return ((Channel) channel).getName().equalsIgnoreCase(this.name) && (this.irc != null && this.irc.equals(((Channel)channel).irc));
 		} catch (final Exception ex) {
 			return false;
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return this.name.hashCode();
 	}
 	
 	/**

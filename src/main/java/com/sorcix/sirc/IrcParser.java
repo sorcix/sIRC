@@ -144,7 +144,7 @@ final class IrcParser {
 				irc.getState().getChannel(channel).addUser(line.getSenderUser());
 			}
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
-				it.next().onJoin(irc, irc.getState().getChannel(line.getMessage()), line.getSenderUser());
+				it.next().onJoin(irc, irc.getState().getChannel(channel), line.getSenderUser());
 			}
 			return;
 		} else if (line.getCommand().equals("PART")) {
