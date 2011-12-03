@@ -44,6 +44,8 @@ final class IrcInput extends Thread {
 	private final BufferedReader in;
 	/** The IrcConnection. */
 	private final IrcConnection irc;
+
+	private final IrcParser parser = new IrcParser();
 	
 	/**
 	 * Creates a new input thread.
@@ -85,14 +87,14 @@ final class IrcInput extends Thread {
 	 */
 	private void handleLine(final String line) {
 		// transform the raw line into an easier format
-		final IrcDecoder parser = new IrcDecoder(line, this.irc);
+		final IrcDecoder decoder = new IrcDecoder(line, this.irc);
 		// Handle numeric server replies.
-		if (parser.isNumeric()) {
-			IrcParser.parseNumeric(this.irc, parser);
+		if (decoder.isNumeric()) {
+			this.parser.parseNumeric(this.irc, decoder);
 			return;
 		}
 		// Handle different commands
-		IrcParser.parseCommand(this.irc, parser);
+		this.parser.parseCommand(this.irc, decoder);
 	}
 	
 	/**
