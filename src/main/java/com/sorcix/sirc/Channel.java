@@ -61,7 +61,7 @@ public final class Channel {
 		this.name = name;
 		this.irc = irc;
 		if (global) {
-			this.users = new ConcurrentHashMap<String, User>(10);
+			this.users = new ConcurrentHashMap<String, User>(100, .75f, 2);
 		} else {
 			this.users = null;
 		}
