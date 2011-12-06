@@ -27,7 +27,7 @@
  */
 package com.sorcix.sirc;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -61,7 +61,7 @@ public final class Channel {
 		this.name = name;
 		this.irc = irc;
 		if (global) {
-			this.users = new HashMap<String, User>(10);
+			this.users = new ConcurrentHashMap<String, User>(10);
 		} else {
 			this.users = null;
 		}
@@ -151,6 +151,10 @@ public final class Channel {
 	 */
 	protected User getUser(final String nickLower) {
 		return this.users.get(nickLower);
+	}
+
+	public User getUs() {
+		return this.users.get(this.irc.getClient().getNickLower());
 	}
 	
 	/**
