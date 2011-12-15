@@ -55,8 +55,6 @@ public class IrcConnection {
 	
 	/** The sIRC about string, used in CTCP */
 	public static String ABOUT = "Sorcix Lib-IRC (sIRC) v" + IrcConnection.VERSION;
-	/** Debug: Show raw messages */
-	protected static final boolean DEBUG_MSG = false;
 	/** Whether this library should call garbage collection. */
 	protected static final boolean GARBAGE_COLLECTION = false;
 	/** sIRC Library version. */
@@ -255,7 +253,7 @@ public class IrcConnection {
 	public void connect(SSLContext sslctx) throws UnknownHostException, IOException, NickNameException, PasswordException {
 		boolean reconnecting = true;
 		// don't even try if nickname is empty
-		if ((this.state.getClient() == null) || this.state.getClient().getNick().trim().isEmpty()) {
+		if ((this.state.getClient() == null) || this.state.getClient().getNick().trim().equals("")) {
 			throw new NickNameException("Nickname is empty or null!");
 		}
 		// check if a server is given
@@ -293,21 +291,34 @@ public class IrcConnection {
 		this.out.sendNowEx("NICK " + this.state.getClient().getNick());
 		// wait for reply
 		String line = null;
-		while ((line = this.in.getReader().readLine()) != null) {
-			if (IrcConnection.DEBUG_MSG) {
-				System.out.println("<<< " + line);
+		loop: while ((line = this.in.getReader().readLine()) != null) {
+			IrcDebug.log(line);
+			final IrcDecoder decoder = new IrcDecoder(line, this);
+			if (decoder.isNumeric()) {
+				final int command = decoder.getNumericCommand();
+				switch (command) {
+				case 1:
+				case 2:
+				case 3: {
+						final String nick = decoder.getArgumentsArray()[0];
+						if (!this.state.getClient().getNick().equals(nick))
+							this.setNick(nick);
+					}; break;
+				case 4: // login OK
+					break loop;
+				case 432:
+				case 433: {
+						// bad/in-use nickname nickname
+						throw new NickNameException("Nickname " + this.state.getClient().getNick() + " already in use or not allowed!");
+					} // break; unnecessary due to throw
+				case 464: {
+						// wrong password
+						this.disconnect();
+						throw new PasswordException("Invalid password");
+					} // break; unnecessary due to throw
+				}
 			}
-			if (line.indexOf("004") >= 0) {
-				// login is OK.
-				break;
-			} else if ((line.indexOf("433") >= 0) || (line.indexOf("432") >= 0)) {
-				// wrong nickname
-				throw new NickNameException("Nickname " + this.state.getClient().getNick() + " already in use or not allowed!");
-			} else if (line.indexOf("464") >= 0) {
-				// wrong password
-				this.disconnect();
-				throw new PasswordException("Invalid password");
-			} else if (line.startsWith("PING ")) {
+			if (line.startsWith("PING ")) {
 				this.out.sendNowEx("PONG " + line.substring(5));
 			}
 		}

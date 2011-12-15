@@ -119,6 +119,7 @@ final class IrcInput extends Thread {
 		} catch (final IOException ex) {
 			this.irc.setConnected(false);
 		} catch (final Exception ex) {
+                        IrcDebug.log("Exception " + ex + " on: " + line);
 			ex.printStackTrace();
 		}
 		// when reaching this, we are disconnected
