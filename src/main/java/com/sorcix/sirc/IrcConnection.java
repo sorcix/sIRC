@@ -407,7 +407,7 @@ public class IrcConnection {
 	 */
 	public void disconnect(final String message) {
 		if (this.isConnected()) {
-			if ((message == null) || message.trim().isEmpty()) {
+			if ((message == null) || message.trim().equals("")) {
 				this.out.sendNow("QUIT");
 			} else {
 				this.out.sendNow("QUIT :" + message);
