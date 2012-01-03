@@ -183,7 +183,7 @@ final class IrcParser {
 				channel.removeUser(kicked);
 			}
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
-				it.next().onKick(irc, channel, line.getSenderUser(), kicked);
+				it.next().onKick(irc, channel, line.getSenderUser(), kicked, line.getMessage());
 			}
 			return;
 		} else if (line.getCommand().equals("MODE")) {

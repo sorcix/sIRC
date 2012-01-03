@@ -236,8 +236,22 @@ public class IrcConnection {
 	}
 	
 	public void connect() throws UnknownHostException, IOException, NickNameException, PasswordException {
-		connect(null);
+		this.connect((SSLContext) null);
 	}
+	public void connect(SSLContext sslctx) throws UnknownHostException, IOException, NickNameException, PasswordException {
+		if (this.server.isSecure()) {
+			try {
+				if (sslctx == null)
+					sslctx = SSLContext.getDefault();
+			} catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
+			this.connect(sslctx.getSocketFactory());
+		} else {
+			this.connect(SocketFactory.getDefault());
+		}
+	}
+
 	/**
 	 * Connect to the IRC server. You must set the server details and
 	 * nickname before calling this method!
@@ -250,7 +264,7 @@ public class IrcConnection {
 	 * @see #setNick(String)
 	 * @since 1.0.0
 	 */
-	public void connect(SSLContext sslctx) throws UnknownHostException, IOException, NickNameException, PasswordException {
+	public void connect(SocketFactory sfact) throws UnknownHostException, IOException, NickNameException, PasswordException {
 		boolean reconnecting = true;
 		// don't even try if nickname is empty
 		if ((this.state.getClient() == null) || this.state.getClient().getNick().trim().equals("")) {
@@ -261,18 +275,6 @@ public class IrcConnection {
 			throw new IOException("Server address is not set!");
 		}
 		// connect socket
-		SocketFactory sfact;
-		if (this.server.isSecure()) {
-			try {
-				if (sslctx == null)
-					sslctx = SSLContext.getDefault();
-			} catch (Exception e) {
-				throw new IllegalStateException(e);
-			}
-			sfact = sslctx.getSocketFactory();
-		} else {
-			sfact = SocketFactory.getDefault();
-		}
 		if (this.socket == null || !this.socket.isConnected()) {
 			this.socket = sfact.createSocket(this.server.getAddress(), this.server.getPort());
 			reconnecting = false;
