@@ -165,8 +165,15 @@ final class IrcParser {
 			return;
 		} else if (line.getCommand().equals("QUIT")) {
 			// someone quit the IRC server
+			final User quitter = line.getSenderUser();
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
-				it.next().onQuit(irc, line.getSenderUser(), line.getMessage());
+				it.next().onQuit(irc, quitter, line.getMessage());
+			}
+			for (final Iterator<Channel> it = irc.getState().getChannels(); it.hasNext();) {
+				final Channel channel = it.next();
+				if (channel.hasUser(quitter)) {
+					channel.removeUser(quitter);
+				}
 			}
 			return;
 		} else if (line.getCommand().equals("KICK")) {

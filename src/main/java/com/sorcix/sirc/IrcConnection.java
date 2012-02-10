@@ -205,6 +205,14 @@ public class IrcConnection {
 	public void askMotd() {
 		this.out.send("MOTD");
 	}
+
+	/**
+	 * Send a raw command to the IRC server.  Unrecognized responses
+	 * are passed to the AdvancedListener's onUnknown() callback.
+	 */
+	public void sendRaw(final String line) {
+		this.out.send(line);
+	}
 	
 	/**
 	 * Asks the userlist for a certain channel.
@@ -252,6 +260,22 @@ public class IrcConnection {
 		}
 	}
 
+	public void connect(SocketFactory sfact) throws UnknownHostException, IOException, NickNameException, PasswordException {
+		// check if a server is given
+		if ((this.server.getAddress() == null)) {
+			throw new IOException("Server address is not set!");
+		}
+		// connect socket
+		if (this.socket == null || !this.socket.isConnected()) {
+			Socket socket = sfact.createSocket(this.server.getAddress(), this.server.getPort());
+			this.socket = null;
+			this.connect(socket);
+		} else if (this.socket != null) {
+			this.connect(this.socket);
+		} else {
+			throw new IllegalStateException("invalid socket state");
+		}
+	}
 	/**
 	 * Connect to the IRC server. You must set the server details and
 	 * nickname before calling this method!
@@ -264,19 +288,16 @@ public class IrcConnection {
 	 * @see #setNick(String)
 	 * @since 1.0.0
 	 */
-	public void connect(SocketFactory sfact) throws UnknownHostException, IOException, NickNameException, PasswordException {
+	public void connect(Socket sock) throws UnknownHostException, IOException, NickNameException, PasswordException {
 		boolean reconnecting = true;
 		// don't even try if nickname is empty
 		if ((this.state.getClient() == null) || this.state.getClient().getNick().trim().equals("")) {
 			throw new NickNameException("Nickname is empty or null!");
 		}
-		// check if a server is given
-		if ((this.server.getAddress() == null)) {
-			throw new IOException("Server address is not set!");
-		}
-		// connect socket
-		if (this.socket == null || !this.socket.isConnected()) {
-			this.socket = sfact.createSocket(this.server.getAddress(), this.server.getPort());
+		// allows for handling SASL, etc. before doing IRC handshake
+		// set to input socket
+		if (sock != null && this.socket != sock) {
+			this.socket = sock;
 			reconnecting = false;
 		}
 		// open streams
