@@ -86,7 +86,7 @@ final class IrcParser {
 					line.getSenderUser().sendCtcpReply("ERRMSG CTCP Command not supported. Use CLIENTINFO to list supported commands.");
 				}
 				return;
-			} else if (line.getArguments().startsWith("#")) {
+			} else if (line.getArguments().startsWith("#") || line.getArguments().startsWith("&")) {
 				// to channel
 				final Channel chan = irc.getState().getChannel(line.getArguments());
 				for (final Iterator<MessageListener> it = irc.getMessageListeners(); it.hasNext();) {
