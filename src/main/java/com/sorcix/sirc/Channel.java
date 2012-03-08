@@ -398,7 +398,7 @@ public final class Channel {
 	 * 
 	 * @param command Command to send.
 	 */
-	private void sendCtcp(final String command) {
+	public void sendCtcp(final String command) {
 		this.irc.getOutput().send("PRIVMSG " + this.getName() + " :" + IrcDecoder.CTCP + command + IrcDecoder.CTCP);
 	}
 	

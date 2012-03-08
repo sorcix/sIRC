@@ -256,7 +256,7 @@ public final class User {
 	 * 
 	 * @param command Command to send.
 	 */
-	private void sendCtcp(final String command) {
+	public void sendCtcp(final String command) {
 		this.irc.getOutput().send("PRIVMSG " + this.getAddress() + " :" + IrcDecoder.CTCP + command + IrcDecoder.CTCP);
 	}
 	
