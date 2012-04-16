@@ -62,7 +62,7 @@ public final class ClientState {
 	 *            The channel to add.
 	 */
 	protected void addChannel(final Channel channel) {
-		if (!this.channels.containsKey(channel.getName())) {
+		if (!this.channels.containsKey(channel.getName().toLowerCase())) {
 			this.channels.put(channel.getName().toLowerCase(), channel);
 		}
 	}
@@ -101,7 +101,7 @@ public final class ClientState {
 	 *         user is not in that channel)
 	 */
 	protected Channel getChannel(final String channel) {
- 		if (this.channels.containsKey(channel.toLowerCase())) {
+ 		if (channel != null && this.channels.containsKey(channel.toLowerCase())) {
 			return this.channels.get(channel.toLowerCase());
 		}
 		return null;
@@ -149,7 +149,7 @@ public final class ClientState {
 	 * @return True if the channel is in the list, false otherwise.
 	 */
 	protected boolean hasChannel(final String name) {
-		return this.channels.containsKey(name.toLowerCase());
+		return name != null && this.channels.containsKey(name.toLowerCase());
 	}
 
 	/**
@@ -166,7 +166,7 @@ public final class ClientState {
 	 *            The channel name.
 	 */
 	protected void removeChannel(final String channel) {
-		if (this.channels.containsKey(channel.toLowerCase())) {
+		if (channel != null && this.channels.containsKey(channel.toLowerCase())) {
 			this.channels.remove(channel.toLowerCase());
 		}
 	}
