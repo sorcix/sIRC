@@ -59,7 +59,7 @@ public class IrcConnection {
 	/** Whether this library should call garbage collection. */
 	protected static final boolean GARBAGE_COLLECTION = true;
 	/** sIRC Library version. */
-	public static final String VERSION = "1.1.3-SNAPSHOT";
+	public static final String VERSION = "1.1.4";
 	/** Advanced listener. */
 	private AdvancedListener advancedListener = null;
 	/** Connection InputStream thread. */
