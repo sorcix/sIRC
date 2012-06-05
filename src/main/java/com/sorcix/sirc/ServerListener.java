@@ -84,7 +84,7 @@ public interface ServerListener {
 	 * @param sender The user who kicked the user.
 	 * @param user The user who was kicked.
 	 */
-	void onKick(IrcConnection irc, Channel channel, User sender, User user);
+	void onKick(IrcConnection irc, Channel channel, User sender, User user, String msg);
 	
 	/**
 	 * Someone (possibly us) changed a channel mode.

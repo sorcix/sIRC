@@ -70,7 +70,9 @@ public final class User {
 	protected static final char PREFIX_OPERATOR = '@';
 	/** Possible user prefixes. */
 	protected static final String USER_PREFIX = "~@%+&";
-	
+
+	private final String realName;
+
 	/**
 	 * Creates a new {@code User}.
 	 * 
@@ -79,7 +81,7 @@ public final class User {
 	 *            user.
 	 */
 	public User(final String nick, final IrcConnection irc) {
-		this(nick, null, null, irc);
+		this(nick, null, null, null, irc);
 	}
 	
 	/**
@@ -91,8 +93,9 @@ public final class User {
 	 * @param irc The IrcConnection used to send messages to this
 	 *            user.
 	 */
-	protected User(final String nick, final String user, final String host, final IrcConnection irc) {
+	protected User(final String nick, final String user, final String host, final String realName, final IrcConnection irc) {
 		this.setNick(nick);
+                this.realName = realName;
 		this.userName = user;
 		this.hostName = host;
 		this.irc = irc;
@@ -160,7 +163,13 @@ public final class User {
 	public String getUserName() {
 		return this.userName;
 	}
-	
+
+	public String getRealName() {
+                if (this.realName == null)
+			return this.nick;
+		return this.realName;
+	}
+
 	/**
 	 * Checks whether this user has Admin privileges.
 	 * 
@@ -247,7 +256,7 @@ public final class User {
 	 * 
 	 * @param command Command to send.
 	 */
-	private void sendCtcp(final String command) {
+	public void sendCtcp(final String command) {
 		this.irc.getOutput().send("PRIVMSG " + this.getAddress() + " :" + IrcPacket.CTCP + command + IrcPacket.CTCP);
 	}
 	
@@ -382,6 +391,8 @@ public final class User {
 	 * @param nick The new nickname.
 	 */
 	protected void setNick(String nick) {
+		if (nick == null)
+			return;
 		if (User.USER_PREFIX.indexOf(nick.charAt(0)) >= 0) {
 			this.prefix = nick.charAt(0);
 			nick = nick.substring(1);

@@ -129,8 +129,11 @@ public final class IrcPacket {
 		if ((this.prefix != null) && (this.prefix.indexOf('!') > 0)) {
 			final String[] stuff = this.prefix.split("@|!");
 			if (stuff.length == 3) {
-				this.sender = new User(stuff[0], stuff[1], stuff[2], irc);
-			}
+				this.sender = new User(stuff[0], stuff[1], stuff[2], null, irc);
+			} else if (stuff.length == 1)
+				this.sender = new User(stuff[0], irc);
+		} else if (prefix != null) {
+			this.sender = new User(this.prefix, irc);
 		}
 	}
 
