@@ -257,7 +257,7 @@ public final class User {
 	 * @param command Command to send.
 	 */
 	public void sendCtcp(final String command) {
-		this.irc.getOutput().send("PRIVMSG " + this.getAddress() + " :" + IrcDecoder.CTCP + command + IrcDecoder.CTCP);
+		this.irc.getOutput().send("PRIVMSG " + this.getAddress() + " :" + IrcPacket.CTCP + command + IrcPacket.CTCP);
 	}
 	
 	/**
@@ -309,9 +309,9 @@ public final class User {
 	 */
 	protected void sendCtcpReply(final String command, final boolean skipQueue) {
 		if (skipQueue) {
-			this.irc.getOutput().sendNow("NOTICE " + this.getAddress() + " :" + IrcDecoder.CTCP + command + IrcDecoder.CTCP);
+			this.irc.getOutput().sendNow("NOTICE " + this.getAddress() + " :" + IrcPacket.CTCP + command + IrcPacket.CTCP);
 		} else {
-			this.irc.getOutput().send("NOTICE " + this.getAddress() + " :" + IrcDecoder.CTCP + command + IrcDecoder.CTCP);
+			this.irc.getOutput().send("NOTICE " + this.getAddress() + " :" + IrcPacket.CTCP + command + IrcPacket.CTCP);
 		}
 	}
 	

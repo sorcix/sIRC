@@ -87,14 +87,14 @@ final class IrcInput extends Thread {
 	 */
 	private void handleLine(final String line) {
 		// transform the raw line into an easier format
-		final IrcDecoder decoder = new IrcDecoder(line, this.irc);
+		final IrcPacket parser = new IrcPacket(line, this.irc);
 		// Handle numeric server replies.
-		if (decoder.isNumeric()) {
-			this.parser.parseNumeric(this.irc, decoder);
+		if (parser.isNumeric()) {
+			this.parser.parseNumeric(this.irc, parser);
 			return;
 		}
 		// Handle different commands
-		this.parser.parseCommand(this.irc, decoder);
+		this.parser.parseCommand(this.irc, parser);
 	}
 	
 	/**
@@ -109,7 +109,7 @@ final class IrcInput extends Thread {
 				IrcDebug.log("<<< " + line);
 				// always respond to PING
 				if (line.startsWith("PING ")) {
-					this.irc.out.sendNowEx("PONG " + line.substring(5));
+					this.irc.out.pong(line.substring(5));
 				} else {
 					this.handleLine(line);
 				}

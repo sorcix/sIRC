@@ -399,7 +399,7 @@ public final class Channel {
 	 * @param command Command to send.
 	 */
 	public void sendCtcp(final String command) {
-		this.irc.getOutput().send("PRIVMSG " + this.getName() + " :" + IrcDecoder.CTCP + command + IrcDecoder.CTCP);
+		this.irc.getOutput().send("PRIVMSG " + this.getName() + " :" + IrcPacket.CTCP + command + IrcPacket.CTCP);
 	}
 	
 	/**
