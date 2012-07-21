@@ -1,5 +1,5 @@
 /*
- * NickNameException.java
+ * PasswordException.java
  * 
  * This file is part of the Sorcix Java IRC Library (sIRC).
  * 
