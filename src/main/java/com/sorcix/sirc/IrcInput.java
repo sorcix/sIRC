@@ -44,6 +44,8 @@ final class IrcInput extends Thread {
 	private final BufferedReader in;
 	/** The IrcConnection. */
 	private final IrcConnection irc;
+
+	private final IrcParser parser = new IrcParser();
 	
 	/**
 	 * Creates a new input thread.
@@ -52,7 +54,7 @@ final class IrcInput extends Thread {
 	 * @param in The stream to use for communication.
 	 */
 	protected IrcInput(final IrcConnection irc, final Reader in) {
-		this.setName("sIRC-IN");
+		this.setName("sIRC-IN:" + irc.getServerAddress() + "-" + irc.getClient().getUserName());
 		this.setPriority(Thread.NORM_PRIORITY);
 		this.setDaemon(false);
 		this.in = new BufferedReader(in);
@@ -88,11 +90,11 @@ final class IrcInput extends Thread {
 		final IrcPacket parser = new IrcPacket(line, this.irc);
 		// Handle numeric server replies.
 		if (parser.isNumeric()) {
-			IrcParser.parseNumeric(this.irc, parser);
+			this.parser.parseNumeric(this.irc, parser);
 			return;
 		}
 		// Handle different commands
-		IrcParser.parseCommand(this.irc, parser);
+		this.parser.parseCommand(this.irc, parser);
 	}
 	
 	/**
@@ -117,6 +119,7 @@ final class IrcInput extends Thread {
 		} catch (final IOException ex) {
 			this.irc.setConnected(false);
 		} catch (final Exception ex) {
+                        IrcDebug.log("Exception " + ex + " on: " + line);
 			ex.printStackTrace();
 		}
 		// when reaching this, we are disconnected

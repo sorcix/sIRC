@@ -54,7 +54,7 @@ class IrcOutput extends Thread {
 	 * @param out The stream to use for communication.
 	 */
 	protected IrcOutput(final IrcConnection irc, final Writer out) {
-		this.setName("sIRC-OUT");
+		this.setName("sIRC-OUT:" + irc.getServerAddress() + "-" + irc.getClient().getUserName());
 		this.setPriority(Thread.MIN_PRIORITY);
 		this.setDaemon(true);
 		this.irc = irc;
@@ -92,7 +92,13 @@ class IrcOutput extends Thread {
 			}
 		} catch (final InterruptedException e) {
 			// end this thread
-		}
+		}/* catch (final IllegalStateException e) {
+			if (this.irc.isConnected()) {
+				this.irc.setConnected(false);
+				this.irc.disconnect();
+			}
+			e.printStackTrace();
+		}*/
 	}
 	
 	/**
@@ -153,7 +159,7 @@ class IrcOutput extends Thread {
 		try {
 			this.sendNowEx(line);
 		} catch (final Exception ex) {
-			// ignore
+			throw new IllegalStateException(ex);
 		}
 	}
 	

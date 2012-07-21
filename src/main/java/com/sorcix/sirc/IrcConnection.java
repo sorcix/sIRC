@@ -30,6 +30,7 @@ package com.sorcix.sirc;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.net.SocketFactory;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
@@ -52,12 +54,11 @@ import javax.net.ssl.SSLSocketFactory;
 public class IrcConnection {
 
 	/** The sIRC about string, used in CTCP */
-	public static final String ABOUT = "Sorcix Lib-IRC (sIRC) v"
-			+ IrcConnection.VERSION;
+	public static String ABOUT = "Sorcix Lib-IRC (sIRC) v" + IrcConnection.VERSION;
 	/** Debug: Show raw messages */
 	protected static final boolean DEBUG_MSG = false;
 	/** Whether this library should call garbage collection. */
-	protected static final boolean GARBAGE_COLLECTION = true;
+	protected static final boolean GARBAGE_COLLECTION = false;
 	/** sIRC Library version. */
 	public static final String VERSION = "1.1.4";
 	/** Advanced listener. */
@@ -221,6 +222,14 @@ public class IrcConnection {
 	}
 
 	/**
+	 * Send a raw command to the IRC server.  Unrecognized responses
+	 * are passed to the AdvancedListener's onUnknown() callback.
+	 */
+	public void sendRaw(final String line) {
+		this.out.send(line);
+	}
+	
+	/**
 	 * Asks the userlist for a certain channel.
 	 * 
 	 * @param channel
@@ -235,6 +244,8 @@ public class IrcConnection {
 	 */
 	private void close() {
 		try {
+			this.in.interrupt();
+			this.out.interrupt();
 			// close input stream
 			this.in.close();
 			// close output stream
@@ -245,6 +256,40 @@ public class IrcConnection {
 			}
 		} catch (final Exception ex) {
 			// ignore
+		}
+	}
+	
+	public void connect() throws UnknownHostException, IOException, NickNameException, PasswordException {
+		this.connect((SSLContext) null);
+	}
+	public void connect(SSLContext sslctx) throws UnknownHostException, IOException, NickNameException, PasswordException {
+		if (this.server.isSecure()) {
+			try {
+				if (sslctx == null)
+					sslctx = SSLContext.getDefault();
+			} catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
+			this.connect(sslctx.getSocketFactory());
+		} else {
+			this.connect(SocketFactory.getDefault());
+		}
+	}
+
+	public void connect(SocketFactory sfact) throws UnknownHostException, IOException, NickNameException, PasswordException {
+		// check if a server is given
+		if ((this.server.getAddress() == null)) {
+			throw new IOException("Server address is not set!");
+		}
+		// connect socket
+		if (this.socket == null || !this.socket.isConnected()) {
+			Socket socket = sfact.createSocket(this.server.getAddress(), this.server.getPort());
+			this.socket = null;
+			this.connect(socket);
+		} else if (this.socket != null) {
+			this.connect(this.socket);
+		} else {
+			throw new IllegalStateException("invalid socket state");
 		}
 	}
 
@@ -262,56 +307,62 @@ public class IrcConnection {
 	 * @see #setNick(String)
 	 * @since 1.0.0
 	 */
-	public void connect() throws UnknownHostException, IOException,
-			NickNameException {
+	public void connect(Socket sock) throws UnknownHostException, IOException, NickNameException, PasswordException {
+		boolean reconnecting = true;
 		// don't even try if nickname is empty
-		if ((this.state.getClient() == null)
-				|| this.state.getClient().getNick().trim().isEmpty()) {
+		if ((this.state.getClient() == null) || this.state.getClient().getNick().trim().equals("")) {
 			throw new NickNameException("Nickname is empty or null!");
 		}
-		// check if a server is given
-		if ((this.server.getAddress() == null)) {
-			throw new IOException("Server address is not set!");
+		// allows for handling SASL, etc. before doing IRC handshake
+		// set to input socket
+		if (sock != null && this.socket != sock) {
+			this.socket = sock;
+			reconnecting = false;
 		}
-		// connect socket
-		SocketFactory sfact;
-		if (this.server.isSecure()) {
-			sfact = SSLSocketFactory.getDefault();
-		} else {
-			sfact = SocketFactory.getDefault();
-		}
-		this.socket = sfact.createSocket(this.server.getAddress(),
-				this.server.getPort());
 		// open streams
-		this.out = new IrcOutput(this, new OutputStreamWriter(
-				this.socket.getOutputStream(), this.charset));
-		this.in = new IrcInput(this, new InputStreamReader(
-				this.socket.getInputStream(), this.charset));
-		// send password if given
-		if (this.server.getPassword() != null) {
-			this.out.sendNowEx(IrcPacketFactory.createPASS(this.server
-					.getPassword()));
+		this.out = new IrcOutput(this, new OutputStreamWriter(this.socket.getOutputStream(), this.charset));
+		this.in = new IrcInput(this, new InputStreamReader(this.socket.getInputStream(), this.charset));
+		if (!reconnecting) {
+			// send password if given
+			if (this.server.getPassword() != null) {
+				this.out.sendNowEx(IrcPacketFactory.createPASS(this.server
+						.getPassword()));
+			}
+			this.out.sendNowEx(IrcPacketFactory.createUSER(this.state.getClient()
+					.getUserName(), this.state.getClient().getNick()));
 		}
-		// register
 		this.out.sendNowEx(IrcPacketFactory.createNICK(this.state.getClient()
 				.getNick()));
-		this.out.sendNowEx(IrcPacketFactory.createUSER(this.state.getClient()
-				.getUserName(), this.state.getClient().getNick()));
 		// wait for reply
 		String line = null;
-		while ((line = this.in.getReader().readLine()) != null) {
-			if (IrcConnection.DEBUG_MSG) {
-				System.out.println("<<< " + line);
+		loop: while ((line = this.in.getReader().readLine()) != null) {
+			IrcDebug.log(line);
+			final IrcPacket decoder = new IrcPacket(line, this);
+			if (decoder.isNumeric()) {
+				final int command = decoder.getNumericCommand();
+				switch (command) {
+				case 1:
+				case 2:
+				case 3: {
+						final String nick = decoder.getArgumentsArray()[0];
+						if (!this.state.getClient().getNick().equals(nick))
+							this.setNick(nick);
+					}; break;
+				case 4: // login OK
+					break loop;
+				case 432:
+				case 433: {
+						// bad/in-use nickname nickname
+						throw new NickNameException("Nickname " + this.state.getClient().getNick() + " already in use or not allowed!");
+					} // break; unnecessary due to throw
+				case 464: {
+						// wrong password
+						this.disconnect();
+						throw new PasswordException("Invalid password");
+					} // break; unnecessary due to throw
+				}
 			}
-			if (line.indexOf("004") >= 0) {
-				// login is OK.
-				break;
-			} else if ((line.indexOf("433") >= 0) || (line.indexOf("432") >= 0)) {
-				// wrong nickname
-				throw new NickNameException("Nickname "
-						+ this.state.getClient().getNick()
-						+ " already in use or not allowed!");
-			} else if (line.startsWith("PING ")) {
+			if (line.startsWith("PING ")) {
 				this.out.pong(line.substring(5));
 			}
 		}
@@ -722,7 +773,7 @@ public class IrcConnection {
 	 * @param connected
 	 *            Whether we are still connected.
 	 */
-	protected void setConnected(final boolean connected) {
+	public void setConnected(final boolean connected) {
 		this.connected = connected;
 	}
 
@@ -753,7 +804,7 @@ public class IrcConnection {
 		if (!this.isConnected()) {
 			if (nick != null) {
 				if (this.state.getClient() == null) {
-					this.state.setClient(new User(nick, "sIRC", null, this));
+					this.state.setClient(new User(nick, "sIRC", null, null, this));
 					return;
 				}
 				this.state.getClient().setNick(nick);
@@ -763,6 +814,20 @@ public class IrcConnection {
 		}
 	}
 
+	public void setUsername(final String username) {
+		setUsername(username, null);
+	}
+	public void setUsername(final String username, final String realname) {
+		if (!this.isConnected()) {
+			if (username != null) {
+				if (this.state.getClient() == null) {
+					this.state.setClient(new User(null, username, null, realname, this));
+					return;
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Removes the away mark.
 	 * 

@@ -38,7 +38,7 @@ import java.util.Iterator;
 final class IrcParser {
 	
 	/** Buffer for motd. */
-	private static StringBuffer buffer = null;
+	private StringBuffer buffer = null;
 	
 	/**
 	 * Parses normal IRC commands.
@@ -46,7 +46,7 @@ final class IrcParser {
 	 * @param irc IrcConnection receiving this line.
 	 * @param line The input line.
 	 */
-	protected static void parseCommand(final IrcConnection irc, final IrcPacket line) {
+	protected void parseCommand(final IrcConnection irc, final IrcPacket line) {
 		if (line.getCommand().equals("PRIVMSG") && (line.getArguments() != null)) {
 			if (line.isCtcp()) {
 				// reply to CTCP commands
@@ -86,7 +86,7 @@ final class IrcParser {
 					line.getSender().sendCtcpReply("ERRMSG CTCP Command not supported. Use CLIENTINFO to list supported commands.");
 				}
 				return;
-			} else if (line.getArguments().startsWith("#")) {
+			} else if (line.getArguments().startsWith("#") || line.getArguments().startsWith("&")) {
 				// to channel
 				final Channel chan = irc.getState().getChannel(line.getArguments());
 				for (final Iterator<MessageListener> it = irc.getMessageListeners(); it.hasNext();) {
@@ -144,7 +144,7 @@ final class IrcParser {
 				irc.getState().getChannel(channel).addUser(line.getSender());
 			}
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
-				it.next().onJoin(irc, irc.getState().getChannel(line.getMessage()), line.getSender());
+				it.next().onJoin(irc, irc.getState().getChannel(channel), line.getSender());
 			}
 			return;
 		} else if (line.getCommand().equals("PART")) {
@@ -165,8 +165,15 @@ final class IrcParser {
 			return;
 		} else if (line.getCommand().equals("QUIT")) {
 			// someone quit the IRC server
+			final User quitter = line.getSender();
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
-				it.next().onQuit(irc, line.getSender(), line.getMessage());
+				it.next().onQuit(irc, quitter, line.getMessage());
+			}
+			for (final Iterator<Channel> it = irc.getState().getChannels(); it.hasNext();) {
+				final Channel channel = it.next();
+				if (channel.hasUser(quitter)) {
+					channel.removeUser(quitter);
+				}
 			}
 			return;
 		} else if (line.getCommand().equals("KICK")) {
@@ -183,11 +190,11 @@ final class IrcParser {
 				channel.removeUser(kicked);
 			}
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
-				it.next().onKick(irc, channel, line.getSender(), kicked);
+				it.next().onKick(irc, channel, line.getSender(), kicked, line.getMessage());
 			}
 			return;
 		} else if (line.getCommand().equals("MODE")) {
-			IrcParser.parseMode(irc, line);
+			this.parseMode(irc, line);
 			return;
 		} else if (line.getCommand().equals("TOPIC")) {
 			// someone changed the topic.
@@ -238,7 +245,7 @@ final class IrcParser {
 	 * @param irc IrcConnection receiving this line.
 	 * @param line The mode change line.
 	 */
-	private static void parseMode(final IrcConnection irc, final IrcPacket line) {
+	private void parseMode(final IrcConnection irc, final IrcPacket line) {
 		final String[] args = line.getArgumentsArray();
 		if ((args.length >= 2) && (Channel.CHANNEL_PREFIX.indexOf(args[0].charAt(0)) >= 0)) {
 			// general mode event listener
@@ -327,7 +334,7 @@ final class IrcParser {
 	 * @param irc IrcConnection receiving this line.
 	 * @param line The input line.
 	 */
-	protected static void parseNumeric(final IrcConnection irc, final IrcPacket line) {
+	protected void parseNumeric(final IrcConnection irc, final IrcPacket line) {
 		switch (line.getNumericCommand()) {
 			case IrcPacket.RPL_TOPIC:
 				for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
@@ -352,16 +359,16 @@ final class IrcParser {
 				}
 				break;
 			case IrcPacket.RPL_MOTD:
-				if (IrcParser.buffer == null) {
-					IrcParser.buffer = new StringBuffer();
+				if (this.buffer == null) {
+					this.buffer = new StringBuffer();
 				}
-				IrcParser.buffer.append(line.getMessage());
-				IrcParser.buffer.append(IrcConnection.ENDLINE);
+				this.buffer.append(line.getMessage());
+				this.buffer.append(IrcConnection.ENDLINE);
 				break;
 			case IrcPacket.RPL_ENDOFMOTD:
-				if (IrcParser.buffer != null) {
-					final String motd = IrcParser.buffer.toString();
-					IrcParser.buffer = null;
+				if (this.buffer != null) {
+					final String motd = this.buffer.toString();
+					this.buffer = null;
 					for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 						it.next().onMotd(irc, motd);
 					}
