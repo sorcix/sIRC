@@ -259,9 +259,40 @@ public class IrcConnection {
 		}
 	}
 	
+	/**
+	 * Connect to the IRC server. You must set the server details and nickname
+	 * before calling this method!
+	 * 
+	 * @throws UnknownHostException
+	 *             When the domain name is invalid.
+	 * @throws IOException
+	 *             When anything went wrong while connecting.
+	 * @throws NickNameException
+	 *             If the given nickname is already in use or invalid.
+	 * @throws PasswordException
+	 *             If the server password is incorrect.
+	 * @see #setServer(String, int)
+	 * @see #setNick(String)
+	 */
 	public void connect() throws UnknownHostException, IOException, NickNameException, PasswordException {
 		this.connect((SSLContext) null);
 	}
+	
+	/**
+	 * Connect to the IRC server. You must set the server details and nickname
+	 * before calling this method!
+	 * 
+	 * @throws UnknownHostException
+	 *             When the domain name is invalid.
+	 * @throws IOException
+	 *             When anything went wrong while connecting.
+	 * @throws NickNameException
+	 *             If the given nickname is already in use or invalid.
+	 * @throws PasswordException
+	 *             If the server password is incorrect.
+	 * @see #setServer(String, int)
+	 * @see #setNick(String)
+	 */
 	public void connect(SSLContext sslctx) throws UnknownHostException, IOException, NickNameException, PasswordException {
 		if (this.server.isSecure()) {
 			try {
@@ -276,6 +307,21 @@ public class IrcConnection {
 		}
 	}
 
+	/**
+	 * Connect to the IRC server. You must set the server details and nickname
+	 * before calling this method!
+	 * 
+	 * @throws UnknownHostException
+	 *             When the domain name is invalid.
+	 * @throws IOException
+	 *             When anything went wrong while connecting.
+	 * @throws NickNameException
+	 *             If the given nickname is already in use or invalid.
+	 * @throws PasswordException
+	 *             If the server password is incorrect.
+	 * @see #setServer(String, int)
+	 * @see #setNick(String)
+	 */
 	public void connect(SocketFactory sfact) throws UnknownHostException, IOException, NickNameException, PasswordException {
 		// check if a server is given
 		if ((this.server.getAddress() == null)) {
@@ -303,6 +349,8 @@ public class IrcConnection {
 	 *             When anything went wrong while connecting.
 	 * @throws NickNameException
 	 *             If the given nickname is already in use or invalid.
+	 * @throws PasswordException
+	 *             If the server password is incorrect.
 	 * @see #setServer(String, int)
 	 * @see #setNick(String)
 	 * @since 1.0.0
