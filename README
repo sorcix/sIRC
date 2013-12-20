@@ -6,10 +6,15 @@ The source code is in my git repository on Github:
 
 → http://github.com/sorcix/sIRC
 
-Old versions (1.1.0 and older) can be found on Google Code:
+== Maven ==
 
-→ http://code.google.com/p/j-sirc/wiki/History
-
+```
+<dependency>
+    <groupId>com.sorcix</groupId>
+    <artifactId>sirc</artifactId>
+    <version>1.1.5</version>
+</dependency>
+```
 
 == Support ==
 
