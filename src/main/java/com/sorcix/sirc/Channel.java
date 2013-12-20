@@ -88,7 +88,7 @@ public final class Channel {
 		if (user.getHostName() != null) {
 			this.setMode("+b *!*@*" + user.getHostName());
 		} else {
-			this.setMode("+b *!" + user.getNick() + "@*");
+			this.setMode("+b " + user.getNick() + "!*@*");
 		}
 		// kick if requested
 		if (kick) {
