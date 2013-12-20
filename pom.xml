@@ -7,6 +7,7 @@
     <name>sIRC</name>
     <description>Sorcix Lib-IRC (sIRC) is a simple IRC library for Java.</description>
     <url>http://vic.demuzere.be/projects/sirc/</url>
+    <packaging>jar</packaging>
 
     <developers>
         <developer>
@@ -28,6 +29,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
+
+    <scm>
+        <connection>scm:git:https://github.com/sorcix/sIRC.git</connection>
+        <developerConnection>scm:git:git@github.com:sorcix/sIRC.git</developerConnection>
+        <url>https://github.com/sorcix/sIRC</url>
+    </scm>
 
     <dependencies>
         <dependency>
