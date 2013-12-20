@@ -6,14 +6,14 @@
     <version>1.1.4</version>
     <name>sIRC</name>
     <description>Sorcix Lib-IRC (sIRC) is a simple IRC library for Java.</description>
-    <url>http://sorcix.com/projects/sirc/</url>
+    <url>http://vic.demuzere.be/projects/sirc/</url>
 
     <developers>
         <developer>
             <id>sorcix</id>
             <name>Vic Demuzere</name>
             <email>vic@demuzere.be</email>
-            <url>http://sorcix.com</url>
+            <url>http://vic.demuzere.be</url>
         </developer>
     </developers>
     <licenses>
