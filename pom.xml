@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sorcix</groupId>
     <artifactId>sirc</artifactId>
-    <version>1.1.5</version>
+    <version>1.1.6-SNAPSHOT</version>
     <name>sIRC</name>
     <description>Sorcix Lib-IRC (sIRC) is a simple IRC library for Java.</description>
     <url>http://vic.demuzere.be/projects/sirc/</url>
