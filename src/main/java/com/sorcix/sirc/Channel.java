@@ -96,20 +96,20 @@ public final class Channel {
 	 * @param reason The message to append to the kick sent to the user.
 	 */
 	public void ban(final User user, final boolean kick, final String reason) {
-	 	if (user.getHostName() != null) {
-	 	 	this.setMode("+b *!*@*" + user.getHostName());
-	 	} else {
-	 	 	this.setMode("+b " + user.getNick() + "!*@*");
-	 	}
+		if (user.getHostName() != null) {
+			this.setMode("+b *!*@*" + user.getHostName());
+		} else {
+			this.setMode("+b " + user.getNick() + "!*@*");
+		}
 
 	 	if (kick) {
 			if (reason == null) {
 				this.kick(user, "Banned");
 			} else {
 	 			this.kick(user, reason);
-		  }
-	 	}
-	 }
+			}
+		}
+	}
 
 	/**
 	 * Changes the topic of this channel. Note that you need
