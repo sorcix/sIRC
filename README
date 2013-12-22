@@ -1,12 +1,15 @@
+# sIRC
 Sorcix Lib-IRC (sIRC) is a simple IRC library for Java.
 
-== Source Code ==
+---
+
+### Source Code
 
 The source code is in my git repository on Github:
 
-→ http://github.com/sorcix/sIRC
+- http://github.com/sorcix/sIRC
 
-== Maven ==
+### Maven
 
 ```
 <dependency>
@@ -15,22 +18,19 @@ The source code is in my git repository on Github:
     <version>1.1.5</version>
 </dependency>
 ```
+### Support
 
-== Support ==
-
-As sIRC contains about everything I needed, I'm not spending much
-time on it anymore. However, if you encounter a bug, or have a feature
-request, don't hesitate to let me know.
+As sIRC contains about everything I needed, I'm not spending much time on it anymore. However, if you encounter a bug, or have a feature request, don't hesitate to let me know.
 
 Use the sIRC issues page
 
-→ http://github.com/sorcix/sIRC/issues
+- http://github.com/sorcix/sIRC/issues
 
 Or send me an e-mail
 
-→ vic@demuzere.be
+- vic@demuzere.be
 
-==
+---
 
 Thanks for your interest in sIRC!
 If you're using it somewhere, let me know. :)
