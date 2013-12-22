@@ -85,17 +85,32 @@ public final class Channel {
 	 * @param kick Whether to kick this user after banning.
 	 */
 	public void ban(final User user, final boolean kick) {
-		if (user.getHostName() != null) {
-			this.setMode("+b *!*@*" + user.getHostName());
-		} else {
-			this.setMode("+b " + user.getNick() + "!*@*");
-		}
-		// kick if requested
 		if (kick) {
-			this.kick(user, "Banned");
-		}
+            ban(user, true, "Banned");
+        } else {
+            ban(user, false, null);
+        }
 	}
-	
+
+    /**
+     * Bans a user from this channel with an optional kick message.
+     *
+     * @param user The User to ban from this channel.
+     * @param kick Whether to kick this user after banning
+     * @param reason The message to append to the kick sent to the user.
+     */
+    public void ban(final User user, final boolean kick, final String reason) {
+        if (user.getHostName() != null) {
+            this.setMode("+b *!*@*" + user.getHostName());
+        } else {
+            this.setMode("+b " + user.getNick() + "!*@*");
+        }
+
+        if (kick) {
+            this.kick(user, reason);
+        }
+    }
+
 	/**
 	 * Changes the topic of this channel. Note that you need
 	 * privileges to do this.
