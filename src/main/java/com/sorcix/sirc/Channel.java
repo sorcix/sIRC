@@ -85,11 +85,7 @@ public final class Channel {
 	 * @param kick Whether to kick this user after banning.
 	 */
 	public void ban(final User user, final boolean kick) {
-		if (kick) {
-	 	 	ban(user, true, "Banned");
-	 	} else {
-	 	 	ban(user, false, null);
-	 	}
+	 	 ban(user, false, null);
 	}
 
 	/**
@@ -107,8 +103,12 @@ public final class Channel {
 	 	}
 
 	 	if (kick) {
-	 	 	this.kick(user, reason);
-	 	  }
+			if (reason == null) {
+				this.kick(user, "Banned");
+			} else {
+	 			this.kick(user, reason);
+		  }
+	 	}
 	 }
 
 	/**
