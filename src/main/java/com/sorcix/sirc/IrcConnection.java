@@ -27,20 +27,17 @@
  */
 package com.sorcix.sirc;
 
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
-import javax.net.SocketFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 
 /**
  * Main IRC Connection class in sIRC.
@@ -224,6 +221,8 @@ public class IrcConnection {
 	/**
 	 * Send a raw command to the IRC server.  Unrecognized responses
 	 * are passed to the AdvancedListener's onUnknown() callback.
+	 *
+	 * @param line The raw line to send.
 	 */
 	public void sendRaw(final String line) {
 		this.out.send(line);
@@ -281,7 +280,8 @@ public class IrcConnection {
 	/**
 	 * Connect to the IRC server. You must set the server details and nickname
 	 * before calling this method!
-	 * 
+	 *
+	 * @param sslctx The SSLContext to use.
 	 * @throws UnknownHostException
 	 *             When the domain name is invalid.
 	 * @throws IOException
@@ -310,7 +310,8 @@ public class IrcConnection {
 	/**
 	 * Connect to the IRC server. You must set the server details and nickname
 	 * before calling this method!
-	 * 
+	 *
+	 * @param sfact The SocketFactory to create a socket with.
 	 * @throws UnknownHostException
 	 *             When the domain name is invalid.
 	 * @throws IOException
@@ -342,7 +343,8 @@ public class IrcConnection {
 	/**
 	 * Connect to the IRC server. You must set the server details and nickname
 	 * before calling this method!
-	 * 
+	 *
+	 * @param sock The socket to connect to.
 	 * @throws UnknownHostException
 	 *             When the domain name is invalid.
 	 * @throws IOException
