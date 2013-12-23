@@ -90,6 +90,7 @@ public final class User {
 	 * @param nick The nickname.
 	 * @param user The username.
 	 * @param host The hostname.
+	 * @param realName The 'real name'.
 	 * @param irc The IrcConnection used to send messages to this
 	 *            user.
 	 */
