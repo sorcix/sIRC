@@ -95,7 +95,7 @@ public final class User {
 	 */
 	protected User(final String nick, final String user, final String host, final String realName, final IrcConnection irc) {
 		this.setNick(nick);
-                this.realName = realName;
+		this.realName = realName;
 		this.userName = user;
 		this.hostName = host;
 		this.irc = irc;
@@ -165,9 +165,7 @@ public final class User {
 	}
 
 	public String getRealName() {
-                if (this.realName == null)
-			return this.nick;
-		return this.realName;
+		return this.realName != null ? this.realName : this.nick;
 	}
 
 	/**
