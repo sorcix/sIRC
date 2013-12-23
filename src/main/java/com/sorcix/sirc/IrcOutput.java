@@ -135,7 +135,7 @@ class IrcOutput extends Thread {
 	 * queue. This method will ignore any exceptions thrown while
 	 * sending the message.
 	 * 
-	 * @param line The data to send.
+	 * @param packet The IrcPacket to send.
 	 */
 	protected synchronized void sendNow(final IrcPacket packet) {
 		try {
@@ -167,7 +167,7 @@ class IrcOutput extends Thread {
 	 * Sends {@link IrcPacket} to the IRC server, without using the message
 	 * queue.
 	 * 
-	 * @param line The raw line to send.
+	 * @param packet The IrcPacket to send.
 	 * @throws IOException If anything goes wrong while sending this
 	 *             message.
 	 */
