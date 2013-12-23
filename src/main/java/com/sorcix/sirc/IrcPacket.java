@@ -172,10 +172,7 @@ public final class IrcPacket {
 	 * @return Arguments array, or {@code null} if there were none.
 	 */
 	public String[] getArgumentsArray() {
-		if (this.arguments == null) {
-			return null;
-		}
-		return this.arguments.split(" ");
+		return this.arguments != null ? this.arguments.split(" ") : null;
 	}
 
 	/**
