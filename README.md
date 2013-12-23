@@ -3,11 +3,10 @@ Sorcix Lib-IRC (sIRC) is a simple IRC library for Java.
 
 ---
 
-### Source Code
-
-The source code is in my git repository on Github:
-
-- http://github.com/sorcix/sIRC
+### Using sIRC
+[![Build Status](https://travis-ci.org/sorcix/sIRC.png?branch=master)](https://travis-ci.org/sorcix/sIRC)
+- Source code on Github: http://github.com/sorcix/sIRC
+- Online javadoc: http://sirc.sorcix.com
 
 ### Maven
 
