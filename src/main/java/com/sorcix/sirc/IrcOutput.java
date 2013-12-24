@@ -184,7 +184,7 @@ class IrcOutput extends Thread {
 	 *             message.
 	 */
 	private synchronized void sendNowEx(String line) throws IOException {
-		if (line.length() > IrcOutput.MAX_LINE_LENGTH - 2) {
+		if (line.length() > (IrcOutput.MAX_LINE_LENGTH - 2)) {
 			line = line.substring(0, IrcOutput.MAX_LINE_LENGTH - 2);
 		}
 		IrcDebug.log(">>> " + line);
