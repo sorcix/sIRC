@@ -243,7 +243,7 @@ final class IrcParser {
 			if ((args.length >= 3)) {
 				final Channel channel = irc.getState().getChannel(args[0]);
 				final String mode = args[1];
-				final boolean enable = mode.charAt(0) == '+' ? true : false;
+				final boolean enable = mode.charAt(0) == '+';
 				char current;
 				// tries all known modes.
 				// this is an ugly part of sIRC, but the only way to
