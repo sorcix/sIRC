@@ -384,7 +384,7 @@ public class IrcConnection {
 		this.out.sendNowEx(IrcPacketFactory.createNICK(this.state.getClient()
 				.getNick()));
 		// wait for reply
-		String line = null;
+		String line;
 		loop: while ((line = this.in.getReader().readLine()) != null) {
 			IrcDebug.log(line);
 			final IrcPacket decoder = new IrcPacket(line, this);
@@ -397,7 +397,7 @@ public class IrcConnection {
 						final String nick = decoder.getArgumentsArray()[0];
 						if (!this.state.getClient().getNick().equals(nick))
 							this.setNick(nick);
-					}; break;
+					} break;
 				case 4: // login OK
 					break loop;
 				case 432:
