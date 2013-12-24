@@ -108,7 +108,6 @@ final class IrcParser {
 						it.next().onCtcpReply(irc, line.getSender(), command, args);
 					}
 				}
-				return;
 			} else if (Channel.CHANNEL_PREFIX.indexOf(line.getArguments().charAt(0)) >= 0) {
 				// to channel
 				final Channel chan = irc.getState().getChannel(line.getArguments());
