@@ -33,7 +33,7 @@ public class UserTest {
         final User user = new User("b", connection);
         user.sendAction(" hello ");
 
-	    verify(ircOutput).send(new IrcPacket(null, "PRIVMSG", "b", IrcPacket.CTCP + "ACTION hello" + IrcPacket.CTCP));
+	    verify(ircOutput).send(new IrcPacket(null, "PRIVMSG", "b", IrcPacket.CTCP + "ACTION hello " + IrcPacket.CTCP));
     }
 
     @Test
@@ -43,7 +43,7 @@ public class UserTest {
         final User user = new User("c", connection);
         user.sendAction(":");
 
-	    verify(ircOutput).send(new IrcPacket(null, "PRIVMSG", "c", IrcPacket.CTCP + "ACTION hello" + IrcPacket.CTCP));
+	    verify(ircOutput).send(new IrcPacket(null, "PRIVMSG", "c", IrcPacket.CTCP + "ACTION :" + IrcPacket.CTCP));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class UserTest {
         final User user = new User("a", connection);
         user.sendCtcpPing();
 
-	    verify(ircOutput).send(new IrcPacket(null, "PRIVMSG", "a", IrcPacket.CTCP + "PING \\d+" + IrcPacket.CTCP));
+	    verify(ircOutput).send(new IrcPacket(matches("PRIVMSG a :" + IrcPacket.CTCP + "PING \\d+" + IrcPacket.CTCP), connection));
     }
 
     @Test
@@ -83,7 +83,7 @@ public class UserTest {
         final User user = new User("b", connection);
         user.sendMessage(" hello ");
 
-	    verify(ircOutput).send(new IrcPacket(null, "PRIVMSG", "b", "hello"));
+	    verify(ircOutput).send(new IrcPacket(null, "PRIVMSG", "b", " hello "));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class UserTest {
         final User user = new User("b", connection);
         user.sendNotice(" hello ");
 
-	    verify(ircOutput).send(new IrcPacket(null, "NOTICE", "b", "hello"));
+	    verify(ircOutput).send(new IrcPacket(null, "NOTICE", "b", " hello "));
     }
 
     @Test
