@@ -222,10 +222,10 @@ public class IrcConnection {
 	 * Send a raw command to the IRC server.  Unrecognized responses
 	 * are passed to the AdvancedListener's onUnknown() callback.
 	 *
-	 * @param line The raw line to send.
+	 * @param packet The raw line to send.
 	 */
-	public void sendRaw(final String line) {
-		out.send(line);
+	public void sendRaw(final IrcPacket packet) {
+		out.send(packet);
 	}
 	
 	/**

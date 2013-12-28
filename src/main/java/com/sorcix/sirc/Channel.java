@@ -118,7 +118,7 @@ public final class Channel {
 	 * @param topic The new topic.
 	 */
 	public void changeTopic(final String topic) {
-		irc.getOutput().send("TOPIC " + getName() + " :" + topic);
+		irc.getOutput().send(new IrcPacket(null, "TOPIC", getName(), topic));
 	}
 	
 	@Override
@@ -277,7 +277,7 @@ public final class Channel {
 	 * Attempts to join this channel.
 	 */
 	public void join() {
-		irc.getOutput().send("JOIN " + getName());
+		irc.getOutput().send(new IrcPacket(null, "JOIN", getName(), null));
 	}
 	
 	/**
@@ -286,7 +286,7 @@ public final class Channel {
 	 * @param password The password needed to join this channel.
 	 */
 	public void join(final String password) {
-		irc.getOutput().send("JOIN " + getName() + " " + password);
+		irc.getOutput().send(new IrcPacket(null, "JOIN", getName() + " " + password, null));
 	}
 	
 	/**
@@ -295,7 +295,7 @@ public final class Channel {
 	 * @param user The user to kick from this channel.
 	 */
 	public void kick(final User user) {
-		irc.getOutput().send("KICK " + getName() + " " + user.getNick());
+		kick(user, null); // Send null so IRC server uses default kick message.
 	}
 	
 	/**
@@ -305,14 +305,18 @@ public final class Channel {
 	 * @param reason The reason why this user was kicked.
 	 */
 	public void kick(final User user, final String reason) {
-		irc.getOutput().send("KICK " + getName() + " " + user.getNick() + " :" + reason);
+		irc.getOutput().send(new IrcPacket(null, "KICK", getName() + " " + user.getNick(), reason));
 	}
 	
 	/**
 	 * Attempts to leave/part this channel.
 	 */
 	public void part() {
-		irc.getOutput().send("PART " + getName());
+		part(null);
+	}
+
+	public void part(String reason) {
+		irc.getOutput().send(new IrcPacket(null, "PART", getName(), reason));
 	}
 	
 	/**
@@ -415,7 +419,7 @@ public final class Channel {
 	 * @param command Command to send.
 	 */
 	public void sendCtcp(final String command) {
-		irc.getOutput().send("PRIVMSG " + getName() + " :" + IrcPacket.CTCP + command + IrcPacket.CTCP);
+		irc.getOutput().send(new IrcPacket(null, "PRIVMSG", getName(), IrcPacket.CTCP + command + IrcPacket.CTCP));
 	}
 	
 	/**
@@ -436,7 +440,7 @@ public final class Channel {
 	 * @param message The message to send.
 	 */
 	public void sendMessage(final String message) {
-		irc.getOutput().send("PRIVMSG " + getName() + " :" + message);
+		irc.getOutput().send(new IrcPacket(null, "PRIVMSG", getName(), message));
 	}
 	
 	/**
@@ -445,7 +449,7 @@ public final class Channel {
 	 * @param message The notice to send.
 	 */
 	public void sendNotice(final String message) {
-		irc.getOutput().send("NOTICE " + getName() + " :" + message);
+		irc.getOutput().send(new IrcPacket(null, "NOTICE", getName(), message));
 	}
 	
 	/**
@@ -474,7 +478,7 @@ public final class Channel {
 	 * @param mode The mode to change.
 	 */
 	public void setMode(final String mode) {
-		irc.getOutput().send("MODE " + getName() + " " + mode);
+		irc.getOutput().send(new IrcPacket(null, "MODE", getName() + " " + mode, null));
 	}
 	
 	/**

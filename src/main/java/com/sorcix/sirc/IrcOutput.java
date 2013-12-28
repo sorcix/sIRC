@@ -85,7 +85,7 @@ class IrcOutput extends Thread {
 				Thread.sleep(irc.getMessageDelay());
 				line = queue.take();
 				if (line != null) {
-					sendNow(line);
+					sendNow(new IrcPacket(line, irc));
 				} else {
 					running = false;
 				}
@@ -108,7 +108,7 @@ class IrcOutput extends Thread {
 	 */
 	protected synchronized void send(final IrcPacket packet) {
 		if (irc.getMessageDelay() == 0) {
-			sendNow(packet.getRaw());
+			sendNow(packet);
 			return;
 		}
 		queue.add(packet.getRaw());
@@ -124,7 +124,7 @@ class IrcOutput extends Thread {
 	protected synchronized void send(final String line) {
 		//TODO: Remove in a future release.
 		if (irc.getMessageDelay() == 0) {
-			sendNow(line);
+			sendNow(new IrcPacket(line, irc));
 			return;
 		}
 		queue.add(line);
@@ -198,7 +198,7 @@ class IrcOutput extends Thread {
 	 */
 	protected void pong(String code) {
 		try {
-			sendNowEx("PONG "+code);
+			sendNowEx("PONG " + code);
 		} catch (final Exception ex) {
 			// ignore
 		}
