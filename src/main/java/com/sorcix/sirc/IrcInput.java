@@ -54,9 +54,9 @@ final class IrcInput extends Thread {
 	 * @param in The stream to use for communication.
 	 */
 	protected IrcInput(final IrcConnection irc, final Reader in) {
-		this.setName("sIRC-IN:" + irc.getServerAddress() + "-" + irc.getClient().getUserName());
-		this.setPriority(Thread.NORM_PRIORITY);
-		this.setDaemon(false);
+		setName("sIRC-IN:" + irc.getServerAddress() + "-" + irc.getClient().getUserName());
+		setPriority(Thread.NORM_PRIORITY);
+		setDaemon(false);
 		this.in = new BufferedReader(in);
 		this.irc = irc;
 	}
@@ -68,7 +68,7 @@ final class IrcInput extends Thread {
 	 * @see IrcConnection#disconnect()
 	 */
 	protected void close() throws IOException {
-		this.in.close();
+		in.close();
 	}
 	
 	/**
@@ -77,7 +77,7 @@ final class IrcInput extends Thread {
 	 * @return the reader.
 	 */
 	protected BufferedReader getReader() {
-		return this.in;
+		return in;
 	}
 	
 	/**
@@ -87,14 +87,14 @@ final class IrcInput extends Thread {
 	 */
 	private void handleLine(final String line) {
 		// transform the raw line into an easier format
-		final IrcPacket parser = new IrcPacket(line, this.irc);
+		final IrcPacket parser = new IrcPacket(line, irc);
 		// Handle numeric server replies.
 		if (parser.isNumeric()) {
-			this.parser.parseNumeric(this.irc, parser);
+			this.parser.parseNumeric(irc, parser);
 			return;
 		}
 		// Handle different commands
-		this.parser.parseCommand(this.irc, parser);
+		this.parser.parseCommand(irc, parser);
 	}
 	
 	/**
@@ -105,30 +105,30 @@ final class IrcInput extends Thread {
 		String line = null;
 		try {
 			// wait for lines to come in
-			while ((line = this.in.readLine()) != null) {
+			while ((line = in.readLine()) != null) {
 				IrcDebug.log("<<< " + line);
 				// always respond to PING
 				if (line.startsWith("PING ")) {
-					this.irc.out.pong(line.substring(5));
+					irc.out.pong(line.substring(5));
 				} else {
-					this.handleLine(line);
+					handleLine(line);
 				}
 			}
 		} catch (final SocketException ex) {
-			this.irc.setConnected(false);
+			irc.setConnected(false);
 		} catch (final IOException ex) {
-			this.irc.setConnected(false);
+			irc.setConnected(false);
 		} catch (final Exception ex) {
 			IrcDebug.log("Exception " + ex + " on: " + line);
 			ex.printStackTrace();
 		}
 		// when reaching this, we are disconnected
-		this.irc.setConnected(false);
+		irc.setConnected(false);
 		// close connections
-		this.irc.disconnect();
+		irc.disconnect();
 		// send disconnect event
-		for (final Iterator<ServerListener> it = this.irc.getServerListeners(); it.hasNext();) {
-			it.next().onDisconnect(this.irc);
+		for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
+			it.next().onDisconnect(irc);
 		}
 	}
 }

@@ -185,7 +185,7 @@ final class IrcParser {
 				it.next().onKick(irc, channel, line.getSender(), kicked, line.getMessage());
 			}
 		} else if (line.getCommand().equals("MODE")) {
-			this.parseMode(irc, line);
+			parseMode(irc, line);
 		} else if (line.getCommand().equals("TOPIC")) {
 			// someone changed the topic.
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
@@ -346,16 +346,16 @@ final class IrcParser {
 				}
 				break;
 			case IrcPacket.RPL_MOTD:
-				if (this.buffer == null) {
-					this.buffer = new StringBuffer();
+				if (buffer == null) {
+					buffer = new StringBuffer();
 				}
-				this.buffer.append(line.getMessage());
-				this.buffer.append(IrcConnection.ENDLINE);
+				buffer.append(line.getMessage());
+				buffer.append(IrcConnection.ENDLINE);
 				break;
 			case IrcPacket.RPL_ENDOFMOTD:
-				if (this.buffer != null) {
-					final String motd = this.buffer.toString();
-					this.buffer = null;
+				if (buffer != null) {
+					final String motd = buffer.toString();
+					buffer = null;
 					for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 						it.next().onMotd(irc, motd);
 					}

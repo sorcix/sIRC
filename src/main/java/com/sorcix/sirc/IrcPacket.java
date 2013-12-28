@@ -264,7 +264,7 @@ public final class IrcPacket {
 	 * @return True if there were arguments.
 	 */
 	public boolean hasArguments() {
-		return (this.arguments != null) && (this.arguments.length() > 0);
+		return (arguments != null) && (arguments.length() > 0);
 	}
 
 	/**
@@ -273,7 +273,7 @@ public final class IrcPacket {
 	 * @return True if there was a message.
 	 */
 	public boolean hasMessage() {
-		return (this.message != null) && (this.message.trim().length() > 0);
+		return (message != null) && (message.trim().length() > 0);
 	}
 
 	/**
@@ -282,7 +282,7 @@ public final class IrcPacket {
 	 * @return True if this message was sent using CTCP, false otherwise.
 	 */
 	public boolean isCtcp() {
-		return this.ctcp;
+		return ctcp;
 	}
 
 	/**
@@ -291,6 +291,6 @@ public final class IrcPacket {
 	 * @return True if this line is a numeric reply.
 	 */
 	public boolean isNumeric() {
-		return this.numeric;
+		return numeric;
 	}
 }

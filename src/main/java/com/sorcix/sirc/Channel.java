@@ -61,9 +61,9 @@ public final class Channel {
 		this.name = name;
 		this.irc = irc;
 		if (global) {
-			this.users = new ConcurrentHashMap<String, User>(100, .75f, 2);
+			users = new ConcurrentHashMap<String, User>(100, .75f, 2);
 		} else {
-			this.users = null;
+			users = null;
 		}
 	}
 	
@@ -73,8 +73,8 @@ public final class Channel {
 	 * @param user The user to add.
 	 */
 	protected void addUser(final User user) {
-		if ((this.users != null) && !this.users.containsKey(user.getNickLower())) {
-			this.users.put(user.getNickLower(), user);
+		if ((users != null) && !users.containsKey(user.getNickLower())) {
+			users.put(user.getNickLower(), user);
 		}
 	}
 	
@@ -97,16 +97,16 @@ public final class Channel {
 	 */
 	public void ban(final User user, final boolean kick, final String reason) {
 		if (user.getHostName() != null) {
-			this.setMode("+b *!*@*" + user.getHostName());
+			setMode("+b *!*@*" + user.getHostName());
 		} else {
-			this.setMode("+b " + user.getNick() + "!*@*");
+			setMode("+b " + user.getNick() + "!*@*");
 		}
 
 	 	if (kick) {
 			if (reason == null) {
-				this.kick(user, "Banned");
+				kick(user, "Banned");
 			} else {
-	 			this.kick(user, reason);
+	 			kick(user, reason);
 			}
 		}
 	}
@@ -118,13 +118,14 @@ public final class Channel {
 	 * @param topic The new topic.
 	 */
 	public void changeTopic(final String topic) {
-		this.irc.getOutput().send("TOPIC " + this.getName() + " :" + topic);
+		irc.getOutput().send("TOPIC " + getName() + " :" + topic);
 	}
 	
 	@Override
 	public boolean equals(final Object channel) {
 		try {
-			return ((Channel) channel).getName().equalsIgnoreCase(this.name) && (this.irc != null && this.irc.equals(((Channel)channel).irc));
+			return ((Channel) channel).getName().equalsIgnoreCase(name)
+					&& (irc != null && irc.equals(((Channel)channel).irc));
 		} catch (final Exception ex) {
 			return false;
 		}
@@ -132,7 +133,7 @@ public final class Channel {
 
 	@Override
 	public int hashCode() {
-		return this.name.hashCode();
+		return name.hashCode();
 	}
 	
 	/**
@@ -150,7 +151,7 @@ public final class Channel {
 	 * @return The topic.
 	 */
 	public String getTopic() {
-		return this.topic;
+		return topic;
 	}
 	
 	/**
@@ -165,11 +166,11 @@ public final class Channel {
 	 *         channel.
 	 */
 	protected User getUser(final String nickLower) {
-		return this.users.get(nickLower);
+		return users.get(nickLower);
 	}
 
 	public User getUs() {
-		return this.users.get(this.irc.getClient().getNickLower());
+		return users.get(irc.getClient().getNickLower());
 	}
 	
 	/**
@@ -188,7 +189,7 @@ public final class Channel {
 	 * @see #isGlobal()
 	 */
 	public Iterator<User> getUsers() {
-		return this.users.values().iterator();
+		return users.values().iterator();
 	}
 	
 	/**
@@ -199,7 +200,7 @@ public final class Channel {
 	 * @since 1.0.0
 	 */
 	public void giveAdmin(final User user) {
-		this.setMode(User.MODE_ADMIN, user, true);
+		setMode(User.MODE_ADMIN, user, true);
 	}
 	
 	/**
@@ -210,7 +211,7 @@ public final class Channel {
 	 * @since 1.0.0
 	 */
 	public void giveFounder(final User user) {
-		this.setMode(User.MODE_FOUNDER, user, true);
+		setMode(User.MODE_FOUNDER, user, true);
 	}
 	
 	/**
@@ -221,7 +222,7 @@ public final class Channel {
 	 * @param user The user to give halfop privileges.
 	 */
 	public void giveHalfop(final User user) {
-		this.setMode(User.MODE_HALF_OP, user, true);
+		setMode(User.MODE_HALF_OP, user, true);
 	}
 	
 	/**
@@ -230,7 +231,7 @@ public final class Channel {
 	 * @param user The user to give operator privileges.
 	 */
 	public void giveOperator(final User user) {
-		this.setMode(User.MODE_OPERATOR, user, true);
+		setMode(User.MODE_OPERATOR, user, true);
 	}
 	
 	/**
@@ -239,7 +240,7 @@ public final class Channel {
 	 * @param user The user to give voice privileges.
 	 */
 	public void giveVoice(final User user) {
-		this.setMode(User.MODE_VOICE, user, true);
+		setMode(User.MODE_VOICE, user, true);
 	}
 	
 	/**
@@ -249,7 +250,7 @@ public final class Channel {
 	 * @return True if given user is in this channel, false otherwise.
 	 */
 	public boolean hasUser(final String nick) {
-		return (this.users != null) && this.users.containsKey(nick.toLowerCase());
+		return (users != null) && users.containsKey(nick.toLowerCase());
 	}
 	
 	/**
@@ -259,7 +260,7 @@ public final class Channel {
 	 * @return True if given user is in this channel, false otherwise.
 	 */
 	public boolean hasUser(final User user) {
-		return this.hasUser(user.getNickLower());
+		return hasUser(user.getNickLower());
 	}
 	
 	/**
@@ -269,14 +270,14 @@ public final class Channel {
 	 * @return True if this channel object is shared.
 	 */
 	public boolean isGlobal() {
-		return this.users != null;
+		return users != null;
 	}
 	
 	/**
 	 * Attempts to join this channel.
 	 */
 	public void join() {
-		this.irc.getOutput().send("JOIN " + this.getName());
+		irc.getOutput().send("JOIN " + getName());
 	}
 	
 	/**
@@ -285,7 +286,7 @@ public final class Channel {
 	 * @param password The password needed to join this channel.
 	 */
 	public void join(final String password) {
-		this.irc.getOutput().send("JOIN " + this.getName() + " " + password);
+		irc.getOutput().send("JOIN " + getName() + " " + password);
 	}
 	
 	/**
@@ -294,7 +295,7 @@ public final class Channel {
 	 * @param user The user to kick from this channel.
 	 */
 	public void kick(final User user) {
-		this.irc.getOutput().send("KICK " + this.getName() + " " + user.getNick());
+		irc.getOutput().send("KICK " + getName() + " " + user.getNick());
 	}
 	
 	/**
@@ -304,14 +305,14 @@ public final class Channel {
 	 * @param reason The reason why this user was kicked.
 	 */
 	public void kick(final User user, final String reason) {
-		this.irc.getOutput().send("KICK " + this.getName() + " " + user.getNick() + " :" + reason);
+		irc.getOutput().send("KICK " + getName() + " " + user.getNick() + " :" + reason);
 	}
 	
 	/**
 	 * Attempts to leave/part this channel.
 	 */
 	public void part() {
-		this.irc.getOutput().send("PART " + this.getName());
+		irc.getOutput().send("PART " + getName());
 	}
 	
 	/**
@@ -321,7 +322,7 @@ public final class Channel {
 	 * @since 1.0.0
 	 */
 	public void removeAdmin(final User user) {
-		this.setMode(User.MODE_ADMIN, user, false);
+		setMode(User.MODE_ADMIN, user, false);
 	}
 	
 	/**
@@ -331,7 +332,7 @@ public final class Channel {
 	 * @since 1.0.0
 	 */
 	public void removeFounder(final User user) {
-		this.setMode(User.MODE_FOUNDER, user, false);
+		setMode(User.MODE_FOUNDER, user, false);
 	}
 	
 	/**
@@ -341,7 +342,7 @@ public final class Channel {
 	 * @since 1.0.0
 	 */
 	public void removeHalfop(final User user) {
-		this.setMode(User.MODE_HALF_OP, user, false);
+		setMode(User.MODE_HALF_OP, user, false);
 	}
 	
 	/**
@@ -350,7 +351,7 @@ public final class Channel {
 	 * @param user The user to remove operator privileges from.
 	 */
 	public void removeOperator(final User user) {
-		this.setMode(User.MODE_OPERATOR, user, false);
+		setMode(User.MODE_OPERATOR, user, false);
 	}
 	
 	/**
@@ -359,8 +360,8 @@ public final class Channel {
 	 * @param user The user to remove.
 	 */
 	protected void removeUser(final User user) {
-		if ((this.users != null) && this.users.containsKey(user.getNickLower())) {
-			this.users.remove(user.getNickLower());
+		if ((users != null) && users.containsKey(user.getNickLower())) {
+			users.remove(user.getNickLower());
 		}
 	}
 	
@@ -370,7 +371,7 @@ public final class Channel {
 	 * @param user The user to remove voice privileges from.
 	 */
 	public void removeVoice(final User user) {
-		this.setMode(User.MODE_VOICE, user, false);
+		setMode(User.MODE_VOICE, user, false);
 	}
 	
 	/**
@@ -380,11 +381,11 @@ public final class Channel {
 	 * @param neww The new nickname.
 	 */
 	protected void renameUser(final String old, final String neww) {
-		if ((this.users != null) && this.users.containsKey(old)) {
-			final User user = this.users.get(old);
-			this.users.remove(old);
+		if ((users != null) && users.containsKey(old)) {
+			final User user = users.get(old);
+			users.remove(old);
 			user.setNick(neww);
-			this.users.put(user.getNickLower(), user);
+			users.put(user.getNickLower(), user);
 		}
 	}
 	
@@ -395,7 +396,7 @@ public final class Channel {
 	 * @see #sendMessage(String)
 	 */
 	public void send(final String message) {
-		this.sendMessage(message);
+		sendMessage(message);
 	}
 	
 	/**
@@ -404,7 +405,7 @@ public final class Channel {
 	 * @param action The action to send.
 	 */
 	public void sendAction(final String action) {
-		this.sendCtcpAction(action);
+		sendCtcpAction(action);
 	}
 	
 	/**
@@ -414,7 +415,7 @@ public final class Channel {
 	 * @param command Command to send.
 	 */
 	public void sendCtcp(final String command) {
-		this.irc.getOutput().send("PRIVMSG " + this.getName() + " :" + IrcPacket.CTCP + command + IrcPacket.CTCP);
+		irc.getOutput().send("PRIVMSG " + getName() + " :" + IrcPacket.CTCP + command + IrcPacket.CTCP);
 	}
 	
 	/**
@@ -425,7 +426,7 @@ public final class Channel {
 	 */
 	protected void sendCtcpAction(final String action) {
 		if ((action != null) && (action.length() != 0)) {
-			this.sendCtcp("ACTION " + action);
+			sendCtcp("ACTION " + action);
 		}
 	}
 	
@@ -435,7 +436,7 @@ public final class Channel {
 	 * @param message The message to send.
 	 */
 	public void sendMessage(final String message) {
-		this.irc.getOutput().send("PRIVMSG " + this.getName() + " :" + message);
+		irc.getOutput().send("PRIVMSG " + getName() + " :" + message);
 	}
 	
 	/**
@@ -444,7 +445,7 @@ public final class Channel {
 	 * @param message The notice to send.
 	 */
 	public void sendNotice(final String message) {
-		this.irc.getOutput().send("NOTICE " + this.getName() + " :" + message);
+		irc.getOutput().send("NOTICE " + getName() + " :" + message);
 	}
 	
 	/**
@@ -456,9 +457,9 @@ public final class Channel {
 	 */
 	public void setMode(final char mode, final User user, final boolean toggle) {
 		if (toggle) {
-			this.setMode("+" + mode + " " + user.getNick());
+			setMode("+" + mode + " " + user.getNick());
 		} else {
-			this.setMode("-" + mode + " " + user.getNick());
+			setMode("-" + mode + " " + user.getNick());
 		}
 	}
 	
@@ -473,7 +474,7 @@ public final class Channel {
 	 * @param mode The mode to change.
 	 */
 	public void setMode(final String mode) {
-		this.irc.getOutput().send("MODE " + this.getName() + " " + mode);
+		irc.getOutput().send("MODE " + getName() + " " + mode);
 	}
 	
 	/**
@@ -489,7 +490,7 @@ public final class Channel {
 	
 	@Override
 	public String toString() {
-		return this.getName();
+		return getName();
 	}
 	
 	/**
@@ -502,14 +503,14 @@ public final class Channel {
 	 * @return The updated shared User object.
 	 */
 	protected User updateUser(final User user, final boolean createNew) {
-		if (this.hasUser(user.getNickLower())) {
+		if (hasUser(user.getNickLower())) {
 			// update user if it exists
-			final User shared = this.getUser(user.getNickLower());
+			final User shared = getUser(user.getNickLower());
 			shared.updateUser(user);
 			return shared;
 		} else if (createNew) {
 			// create a new one
-			this.addUser(user);
+			addUser(user);
 			return user;
 		}
 		return null;
