@@ -256,7 +256,7 @@ public final class User {
 	 * @param command Command to send.
 	 */
 	public void sendCtcp(final String command) {
-		irc.getOutput().send("PRIVMSG " + getAddress() + " :" + IrcPacket.CTCP + command + IrcPacket.CTCP);
+		irc.getOutput().send(new IrcPacket(null, "PRIVMSG", getAddress(), IrcPacket.CTCP + command + IrcPacket.CTCP));
 	}
 	
 	/**
@@ -308,9 +308,9 @@ public final class User {
 	 */
 	protected void sendCtcpReply(final String command, final boolean skipQueue) {
 		if (skipQueue) {
-			irc.getOutput().sendNow("NOTICE " + getAddress() + " :" + IrcPacket.CTCP + command + IrcPacket.CTCP);
+			irc.getOutput().sendNow(new IrcPacket(null, "NOTICE", getAddress(), IrcPacket.CTCP + command + IrcPacket.CTCP));
 		} else {
-			irc.getOutput().send("NOTICE " + getAddress() + " :" + IrcPacket.CTCP + command + IrcPacket.CTCP);
+			irc.getOutput().send(new IrcPacket(null, "NOTICE", getAddress(), IrcPacket.CTCP + command + IrcPacket.CTCP));
 		}
 	}
 	
@@ -327,7 +327,7 @@ public final class User {
 	 * @param message The message to send.
 	 */
 	public void sendMessage(final String message) {
-		irc.getOutput().send("PRIVMSG " + getAddress() + " :" + message);
+		irc.getOutput().send(new IrcPacket(null, "PRIVMSG", getAddress(), message));
 	}
 	
 	/**
@@ -336,7 +336,7 @@ public final class User {
 	 * @param message The notice to send.
 	 */
 	public void sendNotice(final String message) {
-		irc.getOutput().send("NOTICE " + getAddress() + " :" + message);
+		irc.getOutput().send(new IrcPacket(null, "NOTICE", getAddress(), message));
 	}
 	
 	/**
@@ -381,7 +381,7 @@ public final class User {
 	 * @param mode The mode to change.
 	 */
 	public void setMode(final String mode) {
-		irc.getOutput().send("MODE " + getAddress() + " " + mode);
+		irc.getOutput().send(new IrcPacket(null, "MODE", getAddress() + mode, null));
 	}
 	
 	/**
