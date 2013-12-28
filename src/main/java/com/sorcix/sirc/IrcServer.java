@@ -86,7 +86,7 @@ public class IrcServer {
 	 * @return The server address.
 	 */
 	public String getAddress() {
-		return this.address;
+		return address;
 	}
 	
 	/**
@@ -95,7 +95,7 @@ public class IrcServer {
 	 * @return The server password, or {@code null}.
 	 */
 	public String getPassword() {
-		return this.password;
+		return password;
 	}
 	
 	/**
@@ -104,7 +104,7 @@ public class IrcServer {
 	 * @return The server port.
 	 */
 	public int getPort() {
-		return this.port;
+		return port;
 	}
 	
 	/**
@@ -113,7 +113,7 @@ public class IrcServer {
 	 * @return True if this server is using SSL, false otherwise.
 	 */
 	public boolean isSecure() {
-		return this.secure;
+		return secure;
 	}
 	
 	/**

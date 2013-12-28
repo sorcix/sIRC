@@ -133,11 +133,11 @@ public class IrcConnection {
 	public IrcConnection(final String server, final int port,
 			final String password) {
 		this.server = new IrcServer(server, port, password, false);
-		this.serverListeners = new Vector<ServerListener>(4);
-		this.messageListeners = new Vector<MessageListener>(4);
-		this.modeListeners = new Vector<ModeListener>(2);
-		this.services = new Vector<SIRCService>(0);
-		this.state = new ClientState();
+		serverListeners = new Vector<ServerListener>(4);
+		messageListeners = new Vector<MessageListener>(4);
+		modeListeners = new Vector<ModeListener>(2);
+		services = new Vector<SIRCService>(0);
+		state = new ClientState();
 	}
 
 	/**
@@ -159,8 +159,8 @@ public class IrcConnection {
 	 *            The message listener to add.
 	 */
 	public void addMessageListener(final MessageListener listener) {
-		if ((listener != null) && !this.messageListeners.contains(listener)) {
-			this.messageListeners.add(listener);
+		if ((listener != null) && !messageListeners.contains(listener)) {
+			messageListeners.add(listener);
 		}
 	}
 
@@ -175,8 +175,8 @@ public class IrcConnection {
 	 *            The mode listener to add.
 	 */
 	public void addModeListener(final ModeListener listener) {
-		if ((listener != null) && !this.modeListeners.contains(listener)) {
-			this.modeListeners.add(listener);
+		if ((listener != null) && !modeListeners.contains(listener)) {
+			modeListeners.add(listener);
 		}
 	}
 
@@ -187,8 +187,8 @@ public class IrcConnection {
 	 *            The server listener to add.
 	 */
 	public void addServerListener(final ServerListener listener) {
-		if ((listener != null) && !this.serverListeners.contains(listener)) {
-			this.serverListeners.add(listener);
+		if ((listener != null) && !serverListeners.contains(listener)) {
+			serverListeners.add(listener);
 		}
 	}
 
@@ -201,8 +201,8 @@ public class IrcConnection {
 	 *            The service to add.
 	 */
 	public void addService(final SIRCService service) {
-		if ((service != null) && !this.services.contains(service)) {
-			this.services.add(service);
+		if ((service != null) && !services.contains(service)) {
+			services.add(service);
 			service.load(this);
 		}
 	}
@@ -215,7 +215,7 @@ public class IrcConnection {
 	 * @since 1.0.2
 	 */
 	public void askMotd() {
-		this.out.send(IrcPacketFactory.createMOTD());
+		out.send(IrcPacketFactory.createMOTD());
 	}
 
 	/**
@@ -225,7 +225,7 @@ public class IrcConnection {
 	 * @param line The raw line to send.
 	 */
 	public void sendRaw(final String line) {
-		this.out.send(line);
+		out.send(line);
 	}
 	
 	/**
@@ -235,7 +235,7 @@ public class IrcConnection {
 	 *            The channel to request the userlist for.
 	 */
 	protected void askNames(final Channel channel) {
-		this.out.send(IrcPacketFactory.createNAMES(channel.getName()));
+		out.send(IrcPacketFactory.createNAMES(channel.getName()));
 	}
 
 	/**
@@ -243,15 +243,15 @@ public class IrcConnection {
 	 */
 	private void close() {
 		try {
-			this.in.interrupt();
-			this.out.interrupt();
+			in.interrupt();
+			out.interrupt();
 			// close input stream
-			this.in.close();
+			in.close();
 			// close output stream
-			this.out.close();
+			out.close();
 			// close socket
-			if (this.socket.isConnected()) {
-				this.socket.close();
+			if (socket.isConnected()) {
+				socket.close();
 			}
 		} catch (final Exception ex) {
 			// ignore
@@ -274,7 +274,7 @@ public class IrcConnection {
 	 * @see #setNick(String)
 	 */
 	public void connect() throws UnknownHostException, IOException, NickNameException, PasswordException {
-		this.connect((SSLContext) null);
+		connect((SSLContext) null);
 	}
 	
 	/**
@@ -294,16 +294,16 @@ public class IrcConnection {
 	 * @see #setNick(String)
 	 */
 	public void connect(SSLContext sslctx) throws UnknownHostException, IOException, NickNameException, PasswordException {
-		if (this.server.isSecure()) {
+		if (server.isSecure()) {
 			try {
 				if (sslctx == null)
 					sslctx = SSLContext.getDefault();
 			} catch (Exception e) {
 				throw new IllegalStateException(e);
 			}
-			this.connect(sslctx.getSocketFactory());
+			connect(sslctx.getSocketFactory());
 		} else {
-			this.connect(SocketFactory.getDefault());
+			connect(SocketFactory.getDefault());
 		}
 	}
 
@@ -325,16 +325,16 @@ public class IrcConnection {
 	 */
 	public void connect(SocketFactory sfact) throws UnknownHostException, IOException, NickNameException, PasswordException {
 		// check if a server is given
-		if ((this.server.getAddress() == null)) {
+		if ((server.getAddress() == null)) {
 			throw new IOException("Server address is not set!");
 		}
 		// connect socket
-		if (this.socket == null || !this.socket.isConnected()) {
-			Socket socket = sfact.createSocket(this.server.getAddress(), this.server.getPort());
-			this.socket = null;
-			this.connect(socket);
-		} else if (this.socket != null) {
-			this.connect(this.socket);
+		if (socket == null || !socket.isConnected()) {
+			Socket socket = sfact.createSocket(server.getAddress(), server.getPort());
+			socket = null;
+			connect(socket);
+		} else if (socket != null) {
+			connect(socket);
 		} else {
 			throw new IllegalStateException("invalid socket state");
 		}
@@ -360,32 +360,32 @@ public class IrcConnection {
 	public void connect(Socket sock) throws UnknownHostException, IOException, NickNameException, PasswordException {
 		boolean reconnecting = true;
 		// don't even try if nickname is empty
-		if ((this.state.getClient() == null) || this.state.getClient().getNick().trim().equals("")) {
+		if ((state.getClient() == null) || state.getClient().getNick().trim().equals("")) {
 			throw new NickNameException("Nickname is empty or null!");
 		}
 		// allows for handling SASL, etc. before doing IRC handshake
 		// set to input socket
-		if (sock != null && this.socket != sock) {
-			this.socket = sock;
+		if (sock != null && socket != sock) {
+			socket = sock;
 			reconnecting = false;
 		}
 		// open streams
-		this.out = new IrcOutput(this, new OutputStreamWriter(this.socket.getOutputStream(), this.charset));
-		this.in = new IrcInput(this, new InputStreamReader(this.socket.getInputStream(), this.charset));
+		out = new IrcOutput(this, new OutputStreamWriter(socket.getOutputStream(), charset));
+		in = new IrcInput(this, new InputStreamReader(socket.getInputStream(), charset));
 		if (!reconnecting) {
 			// send password if given
-			if (this.server.getPassword() != null) {
-				this.out.sendNowEx(IrcPacketFactory.createPASS(this.server
+			if (server.getPassword() != null) {
+				out.sendNowEx(IrcPacketFactory.createPASS(server
 						.getPassword()));
 			}
-			this.out.sendNowEx(IrcPacketFactory.createUSER(this.state.getClient()
-					.getUserName(), this.state.getClient().getNick()));
+			out.sendNowEx(IrcPacketFactory.createUSER(state.getClient()
+					.getUserName(), state.getClient().getNick()));
 		}
-		this.out.sendNowEx(IrcPacketFactory.createNICK(this.state.getClient()
+		out.sendNowEx(IrcPacketFactory.createNICK(state.getClient()
 				.getNick()));
 		// wait for reply
-		String line = null;
-		loop: while ((line = this.in.getReader().readLine()) != null) {
+		String line;
+		loop: while ((line = in.getReader().readLine()) != null) {
 			IrcDebug.log(line);
 			final IrcPacket decoder = new IrcPacket(line, this);
 			if (decoder.isNumeric()) {
@@ -395,34 +395,34 @@ public class IrcConnection {
 				case 2:
 				case 3: {
 						final String nick = decoder.getArgumentsArray()[0];
-						if (!this.state.getClient().getNick().equals(nick))
-							this.setNick(nick);
-					}; break;
+						if (!state.getClient().getNick().equals(nick))
+							setNick(nick);
+					} break;
 				case 4: // login OK
 					break loop;
 				case 432:
 				case 433: {
 						// bad/in-use nickname nickname
-						throw new NickNameException("Nickname " + this.state.getClient().getNick() + " already in use or not allowed!");
+						throw new NickNameException("Nickname " + state.getClient().getNick() + " already in use or not allowed!");
 					} // break; unnecessary due to throw
 				case 464: {
 						// wrong password
-						this.disconnect();
+						disconnect();
 						throw new PasswordException("Invalid password");
 					} // break; unnecessary due to throw
 				}
 			}
 			if (line.startsWith("PING ")) {
-				this.out.pong(line.substring(5));
+				out.pong(line.substring(5));
 			}
 		}
 		// start listening
-		this.in.start();
-		this.out.start();
+		in.start();
+		out.start();
 		// we are connected
-		this.setConnected(true);
+		setConnected(true);
 		// send events
-		for (final Iterator<ServerListener> it = this.getServerListeners(); it
+		for (final Iterator<ServerListener> it = getServerListeners(); it
 				.hasNext();) {
 			it.next().onConnect(this);
 		}
@@ -444,8 +444,8 @@ public class IrcConnection {
 		if (Channel.CHANNEL_PREFIX.indexOf(name.charAt(0)) < 0) {
 			name = "#" + name;
 		}
-		if (this.getState().hasChannel(name)) {
-			return this.getState().getChannel(name);
+		if (getState().hasChannel(name)) {
+			return getState().getChannel(name);
 		} else {
 			return new Channel(name, this, false);
 		}
@@ -477,10 +477,10 @@ public class IrcConnection {
 	 * @return A {@code User} object representing given user.
 	 */
 	public User createUser(final String nick, final String channel) {
-		final User empty = this.createUser(nick);
-		if (this.getState().hasChannel(channel)
-				&& this.getState().getChannel(channel).hasUser(nick)) {
-			return this.getState().getChannel(channel).getUser(nick);
+		final User empty = createUser(nick);
+		if (getState().hasChannel(channel)
+				&& getState().getChannel(channel).hasUser(nick)) {
+			return getState().getChannel(channel).getUser(nick);
 		} else {
 			return empty;
 		}
@@ -492,7 +492,7 @@ public class IrcConnection {
 	 * disconnect us.
 	 */
 	public void disconnect() {
-		this.disconnect(null);
+		disconnect(null);
 	}
 
 	/**
@@ -504,12 +504,12 @@ public class IrcConnection {
 	 *            The QUIT message to use.
 	 */
 	public void disconnect(final String message) {
-		if (this.isConnected()) {
-			this.out.sendNow(IrcPacketFactory.createQUIT(message));
+		if (isConnected()) {
+			out.sendNow(IrcPacketFactory.createQUIT(message));
 		} else {
-			this.close();
-			this.getState().removeAll();
-			this.garbageCollection();
+			close();
+			getState().removeAll();
+			garbageCollection();
 		}
 	}
 
@@ -528,7 +528,7 @@ public class IrcConnection {
 	 * @return The advanced listener, or null.
 	 */
 	protected AdvancedListener getAdvancedListener() {
-		return this.advancedListener;
+		return advancedListener;
 	}
 
 	/**
@@ -537,7 +537,7 @@ public class IrcConnection {
 	 * @return All channels we're currently in.
 	 */
 	public Iterator<Channel> getChannels() {
-		return this.getState().getChannels();
+		return getState().getChannels();
 	}
 
 	/**
@@ -548,7 +548,7 @@ public class IrcConnection {
 	 * @return The character set for the connection's encoding.
 	 */
 	public Charset getCharset() {
-		return this.charset;
+		return charset;
 	}
 
 	/**
@@ -557,7 +557,7 @@ public class IrcConnection {
 	 * @return User representing this client.
 	 */
 	public User getClient() {
-		return this.state.getClient();
+		return state.getClient();
 	}
 
 	/**
@@ -566,7 +566,7 @@ public class IrcConnection {
 	 * @return Outgoing message delay in milliseconds.
 	 */
 	public int getMessageDelay() {
-		return this.messageDelay;
+		return messageDelay;
 	}
 
 	/**
@@ -575,7 +575,7 @@ public class IrcConnection {
 	 * @return All {@code MessageListeners}.
 	 */
 	protected Iterator<MessageListener> getMessageListeners() {
-		return this.messageListeners.iterator();
+		return messageListeners.iterator();
 	}
 
 	/**
@@ -584,7 +584,7 @@ public class IrcConnection {
 	 * @return All {@code ModeListeners}.
 	 */
 	protected Iterator<ModeListener> getModeListeners() {
-		return this.modeListeners.iterator();
+		return modeListeners.iterator();
 	}
 
 	/**
@@ -594,7 +594,7 @@ public class IrcConnection {
 	 * @return The {@code IrcOutput} used to send messages.
 	 */
 	protected IrcOutput getOutput() {
-		return this.out;
+		return out;
 	}
 
 	/**
@@ -603,7 +603,7 @@ public class IrcConnection {
 	 * @return The IRC server.
 	 */
 	public IrcServer getServer() {
-		return this.server;
+		return server;
 	}
 
 	/**
@@ -613,7 +613,7 @@ public class IrcConnection {
 	 * @since 1.0.0
 	 */
 	public String getServerAddress() {
-		return this.server.getAddress();
+		return server.getAddress();
 	}
 
 	/**
@@ -622,7 +622,7 @@ public class IrcConnection {
 	 * @return All {@code ServerListeners}.
 	 */
 	protected Iterator<ServerListener> getServerListeners() {
-		return this.serverListeners.iterator();
+		return serverListeners.iterator();
 	}
 
 	/**
@@ -632,7 +632,7 @@ public class IrcConnection {
 	 * @since 1.0.0
 	 */
 	public int getServerPort() {
-		return this.server.getPort();
+		return server.getPort();
 	}
 
 	/**
@@ -641,7 +641,7 @@ public class IrcConnection {
 	 * @return All running services.
 	 */
 	private Iterator<SIRCService> getServices() {
-		return this.services.iterator();
+		return services.iterator();
 	}
 
 	/**
@@ -651,7 +651,7 @@ public class IrcConnection {
 	 * @since 1.1.0
 	 */
 	public ClientState getState() {
-		return this.state;
+		return state;
 	}
 
 	/**
@@ -661,8 +661,8 @@ public class IrcConnection {
 	 * @since 0.9.4
 	 */
 	protected String getVersion() {
-		if (this.version != null) {
-			return this.version;
+		if (version != null) {
+			return version;
 		}
 		return IrcConnection.ABOUT;
 	}
@@ -673,7 +673,7 @@ public class IrcConnection {
 	 * @return {@code true} if redirection is allowed, {@code false} otherwise.
 	 */
 	public boolean isBounceAllowed() {
-		return this.bounceAllowed;
+		return bounceAllowed;
 	}
 
 	/**
@@ -682,7 +682,7 @@ public class IrcConnection {
 	 * @return True if the client is connected, false otherwise.
 	 */
 	public boolean isConnected() {
-		return this.connected;
+		return connected;
 	}
 
 	/**
@@ -693,7 +693,7 @@ public class IrcConnection {
 	 * @return True if given {@code User} represents us, false otherwise.
 	 */
 	public boolean isUs(final User user) {
-		return user.equals(this.state.getClient());
+		return user.equals(state.getClient());
 	}
 
 	/**
@@ -702,7 +702,7 @@ public class IrcConnection {
 	 * @return True if this connection is using SSL, false otherwise.
 	 */
 	public boolean isUsingSSL() {
-		return this.server.isSecure();
+		return server.isSecure();
 	}
 
 	/**
@@ -711,10 +711,10 @@ public class IrcConnection {
 	 * @see #removeService(SIRCService)
 	 */
 	public void removeAllServices() {
-		if (this.services.size() > 0) {
-			for (final Iterator<SIRCService> it = this.getServices(); it
+		if (services.size() > 0) {
+			for (final Iterator<SIRCService> it = getServices(); it
 					.hasNext();) {
-				this.removeService(it.next());
+				removeService(it.next());
 			}
 		}
 	}
@@ -726,8 +726,8 @@ public class IrcConnection {
 	 *            The message listener to remove.
 	 */
 	public void removeMessageListener(final MessageListener listener) {
-		if ((listener != null) && this.messageListeners.contains(listener)) {
-			this.messageListeners.remove(listener);
+		if ((listener != null) && messageListeners.contains(listener)) {
+			messageListeners.remove(listener);
 		}
 	}
 
@@ -738,8 +738,8 @@ public class IrcConnection {
 	 *            The mode listener to remove.
 	 */
 	public void removeModeListener(final ModeListener listener) {
-		if ((listener != null) && this.modeListeners.contains(listener)) {
-			this.modeListeners.remove(listener);
+		if ((listener != null) && modeListeners.contains(listener)) {
+			modeListeners.remove(listener);
 		}
 	}
 
@@ -750,8 +750,8 @@ public class IrcConnection {
 	 *            The server listener to remove.
 	 */
 	public void removeServerListener(final ServerListener listener) {
-		if ((listener != null) && this.serverListeners.contains(listener)) {
-			this.serverListeners.remove(listener);
+		if ((listener != null) && serverListeners.contains(listener)) {
+			serverListeners.remove(listener);
 		}
 	}
 
@@ -764,9 +764,9 @@ public class IrcConnection {
 	 *            The service to remove.
 	 */
 	public void removeService(final SIRCService service) {
-		if ((service != null) && !this.services.contains(service)) {
+		if ((service != null) && !services.contains(service)) {
 			service.unload(this);
-			this.services.remove(service);
+			services.remove(service);
 		}
 	}
 
@@ -777,7 +777,7 @@ public class IrcConnection {
 	 *            The advanced listener to use, or {@code null}.
 	 */
 	public void setAdvancedListener(final AdvancedListener listener) {
-		this.advancedListener = listener;
+		advancedListener = listener;
 	}
 
 	/**
@@ -790,7 +790,7 @@ public class IrcConnection {
 	 * @since 1.0.2
 	 */
 	public void setAway(final String reason) {
-		this.out.send(IrcPacketFactory.createAWAY(reason));
+		out.send(IrcPacketFactory.createAWAY(reason));
 	}
 
 	/**
@@ -851,16 +851,16 @@ public class IrcConnection {
 	 *            New nickname.
 	 */
 	public void setNick(final String nick) {
-		if (!this.isConnected()) {
+		if (!isConnected()) {
 			if (nick != null) {
-				if (this.state.getClient() == null) {
-					this.state.setClient(new User(nick, "sIRC", null, null, this));
+				if (state.getClient() == null) {
+					state.setClient(new User(nick, "sIRC", null, null, this));
 					return;
 				}
-				this.state.getClient().setNick(nick);
+				state.getClient().setNick(nick);
 			}
 		} else {
-			this.out.sendNow(IrcPacketFactory.createNICK(nick));
+			out.sendNow(IrcPacketFactory.createNICK(nick));
 		}
 	}
 
@@ -868,10 +868,10 @@ public class IrcConnection {
 		setUsername(username, null);
 	}
 	public void setUsername(final String username, final String realname) {
-		if (!this.isConnected()) {
+		if (!isConnected()) {
 			if (username != null) {
-				if (this.state.getClient() == null) {
-					this.state.setClient(new User(null, username, null, realname, this));
+				if (state.getClient() == null) {
+					state.setClient(new User(null, username, null, realname, this));
 					return;
 				}
 			}
@@ -885,7 +885,7 @@ public class IrcConnection {
 	 * @since 1.0.2
 	 */
 	public void setNotAway() {
-		this.setAway(null);
+		setAway(null);
 	}
 
 	/**
@@ -895,7 +895,7 @@ public class IrcConnection {
 	 *            The server to connect to.
 	 */
 	public void setServer(final IrcServer server) {
-		if (!this.isConnected()) {
+		if (!isConnected()) {
 			this.server = server;
 		}
 	}
@@ -910,8 +910,8 @@ public class IrcConnection {
 	 * @since 1.0.0
 	 */
 	public void setServer(final String address, final int port) {
-		this.setServerAddress(address);
-		this.setServerPort(port);
+		setServerAddress(address);
+		setServerPort(port);
 	}
 
 	/**
@@ -922,8 +922,8 @@ public class IrcConnection {
 	 * @since 1.0.0
 	 */
 	public void setServerAddress(final String address) {
-		if (!this.isConnected() && (address != null)) {
-			this.server.setAddress(address);
+		if (!isConnected() && (address != null)) {
+			server.setAddress(address);
 		}
 	}
 
@@ -934,8 +934,8 @@ public class IrcConnection {
 	 *            The port number to use.
 	 */
 	public void setServerPort(final int port) {
-		if (!this.isConnected() && (port > 0)) {
-			this.server.setPort(port);
+		if (!isConnected() && (port > 0)) {
+			server.setPort(port);
 		}
 	}
 
@@ -950,8 +950,8 @@ public class IrcConnection {
 	 * @see #setServerPort(int)
 	 */
 	public void setUsingSSL(final boolean usingSSL) {
-		if (!this.isConnected()) {
-			this.server.setSecure(usingSSL);
+		if (!isConnected()) {
+			server.setSecure(usingSSL);
 		}
 	}
 
