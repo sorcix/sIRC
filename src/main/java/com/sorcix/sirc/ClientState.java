@@ -51,8 +51,8 @@ public final class ClientState {
 	 * Creates a new ClientState.
 	 */
 	protected ClientState() {
-		this.channels = new HashMap<String, Channel>();
-		this.users = new HashMap<String, User>();
+		channels = new HashMap<String, Channel>();
+		users = new HashMap<String, User>();
 	}
 
 	/**
@@ -62,8 +62,8 @@ public final class ClientState {
 	 *            The channel to add.
 	 */
 	protected void addChannel(final Channel channel) {
-		if (!this.channels.containsKey(channel.getName().toLowerCase())) {
-			this.channels.put(channel.getName().toLowerCase(), channel);
+		if (!channels.containsKey(channel.getName().toLowerCase())) {
+			channels.put(channel.getName().toLowerCase(), channel);
 		}
 	}
 
@@ -74,8 +74,8 @@ public final class ClientState {
 	 *            The user to add.
 	 */
 	protected void addUser(final User user) {
-		if (!this.users.containsKey(user.getNickLower())) {
-			this.users.put(user.getNickLower(), user);
+		if (!users.containsKey(user.getNickLower())) {
+			users.put(user.getNickLower(), user);
 		}
 	}
 
@@ -89,7 +89,7 @@ public final class ClientState {
 	 * @see #getChannel(String)
 	 */
 	protected Channel getChannel(final Channel channel) {
-		return this.getChannel(channel.getName());
+		return getChannel(channel.getName());
 	}
 
 	/**
@@ -101,8 +101,8 @@ public final class ClientState {
 	 *         user is not in that channel)
 	 */
 	protected Channel getChannel(final String channel) {
- 		if (channel != null && this.channels.containsKey(channel.toLowerCase())) {
-			return this.channels.get(channel.toLowerCase());
+ 		if (channel != null && channels.containsKey(channel.toLowerCase())) {
+			return channels.get(channel.toLowerCase());
 		}
 		return null;
 	}
@@ -113,7 +113,7 @@ public final class ClientState {
 	 * @return an iterator through all Channels.
 	 */
 	public Iterator<Channel> getChannels() {
-		return this.channels.values().iterator();
+		return channels.values().iterator();
 	}
 
 	/**
@@ -122,7 +122,7 @@ public final class ClientState {
 	 * @return The local {@code User}.
 	 */
 	public User getClient() {
-		return this.client;
+		return client;
 	}
 
 	/**
@@ -135,8 +135,8 @@ public final class ClientState {
 	 */
 	protected User getUser(final String nick) {
 		//TODO: implement singleton users in User, Channel and IrcConnection
-		if (this.users.containsKey(nick)) {
-			return this.users.get(nick);
+		if (users.containsKey(nick)) {
+			return users.get(nick);
 		}
 		return null;
 	}
@@ -149,14 +149,14 @@ public final class ClientState {
 	 * @return True if the channel is in the list, false otherwise.
 	 */
 	protected boolean hasChannel(final String name) {
-		return name != null && this.channels.containsKey(name.toLowerCase());
+		return name != null && channels.containsKey(name.toLowerCase());
 	}
 
 	/**
 	 * Remove all channels from the channel map.
 	 */
 	protected void removeAll() {
-		this.channels.clear();
+		channels.clear();
 	}
 
 	/**
@@ -166,8 +166,8 @@ public final class ClientState {
 	 *            The channel name.
 	 */
 	protected void removeChannel(final String channel) {
-		if (channel != null && this.channels.containsKey(channel.toLowerCase())) {
-			this.channels.remove(channel.toLowerCase());
+		if (channel != null && channels.containsKey(channel.toLowerCase())) {
+			channels.remove(channel.toLowerCase());
 		}
 	}
 
@@ -178,6 +178,6 @@ public final class ClientState {
 	 *            The local {@code User}.
 	 */
 	protected void setClient(final User user) {
-		this.client = user;
+		client = user;
 	}
 }

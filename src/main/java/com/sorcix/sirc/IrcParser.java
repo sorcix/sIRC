@@ -85,20 +85,17 @@ final class IrcParser {
 					// send error message
 					line.getSender().sendCtcpReply("ERRMSG CTCP Command not supported. Use CLIENTINFO to list supported commands.");
 				}
-				return;
 			} else if (line.getArguments().startsWith("#") || line.getArguments().startsWith("&")) {
 				// to channel
 				final Channel chan = irc.getState().getChannel(line.getArguments());
 				for (final Iterator<MessageListener> it = irc.getMessageListeners(); it.hasNext();) {
 					it.next().onMessage(irc, chan.updateUser(line.getSender(), true), chan, line.getMessage());
 				}
-				return;
 			} else {
 				// to user
 				for (final Iterator<MessageListener> it = irc.getMessageListeners(); it.hasNext();) {
 					it.next().onPrivateMessage(irc, line.getSender(), line.getMessage());
 				}
-				return;
 			}
 		} else if (line.getCommand().equals("NOTICE") && (line.getArguments() != null)) {
 			if (line.isCtcp()) {
@@ -111,7 +108,6 @@ final class IrcParser {
 						it.next().onCtcpReply(irc, line.getSender(), command, args);
 					}
 				}
-				return;
 			} else if (Channel.CHANNEL_PREFIX.indexOf(line.getArguments().charAt(0)) >= 0) {
 				// to channel
 				final Channel chan = irc.getState().getChannel(line.getArguments());
@@ -124,7 +120,6 @@ final class IrcParser {
 					it.next().onNotice(irc, line.getSender(), line.getMessage());
 				}
 			}
-			return;
 		} else if (line.getCommand().equals("JOIN")) {
 			// some server seem to send the joined channel as message,
 			// while others have it as an argument. (quakenet related)
@@ -146,7 +141,6 @@ final class IrcParser {
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 				it.next().onJoin(irc, irc.getState().getChannel(channel), line.getSender());
 			}
-			return;
 		} else if (line.getCommand().equals("PART")) {
 			// someone left a channel
 			if (line.getSender().isUs()) {
@@ -162,7 +156,6 @@ final class IrcParser {
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 				it.next().onPart(irc, irc.getState().getChannel(line.getArguments()), line.getSender(), line.getMessage());
 			}
-			return;
 		} else if (line.getCommand().equals("QUIT")) {
 			// someone quit the IRC server
 			final User quitter = line.getSender();
@@ -175,7 +168,6 @@ final class IrcParser {
 					channel.removeUser(quitter);
 				}
 			}
-			return;
 		} else if (line.getCommand().equals("KICK")) {
 			// someone was kicked from a channel
 			final String[] data = line.getArgumentsArray();
@@ -192,17 +184,14 @@ final class IrcParser {
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 				it.next().onKick(irc, channel, line.getSender(), kicked, line.getMessage());
 			}
-			return;
 		} else if (line.getCommand().equals("MODE")) {
-			this.parseMode(irc, line);
-			return;
+			parseMode(irc, line);
 		} else if (line.getCommand().equals("TOPIC")) {
 			// someone changed the topic.
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 				final Channel chan = irc.getState().getChannel(line.getArguments());
 				it.next().onTopic(irc, chan, chan.updateUser(line.getSender(), false), line.getMessage());
 			}
-			return;
 		} else if (line.getCommand().equals("NICK")) {
 			User newUser;
 			if (line.hasMessage()) {
@@ -221,7 +210,6 @@ final class IrcParser {
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 				it.next().onNick(irc, line.getSender(), newUser);
 			}
-			return;
 		} else if (line.getCommand().equals("INVITE")) {
 			// someone was invited
 			final String[] args = line.getArgumentsArray();
@@ -231,7 +219,6 @@ final class IrcParser {
 					it.next().onInvite(irc, line.getSender(), new User(args[0], irc), channel);
 				}
 			}
-			return;
 		} else {
 			if (irc.getAdvancedListener() != null) {
 				irc.getAdvancedListener().onUnknown(irc, line);
@@ -255,7 +242,7 @@ final class IrcParser {
 			if ((args.length >= 3)) {
 				final Channel channel = irc.getState().getChannel(args[0]);
 				final String mode = args[1];
-				final boolean enable = mode.charAt(0) == '+' ? true : false;
+				final boolean enable = mode.charAt(0) == '+';
 				char current;
 				// tries all known modes.
 				// this is an ugly part of sIRC, but the only way to
@@ -359,16 +346,16 @@ final class IrcParser {
 				}
 				break;
 			case IrcPacket.RPL_MOTD:
-				if (this.buffer == null) {
-					this.buffer = new StringBuffer();
+				if (buffer == null) {
+					buffer = new StringBuffer();
 				}
-				this.buffer.append(line.getMessage());
-				this.buffer.append(IrcConnection.ENDLINE);
+				buffer.append(line.getMessage());
+				buffer.append(IrcConnection.ENDLINE);
 				break;
 			case IrcPacket.RPL_ENDOFMOTD:
-				if (this.buffer != null) {
-					final String motd = this.buffer.toString();
-					this.buffer = null;
+				if (buffer != null) {
+					final String motd = buffer.toString();
+					buffer = null;
 					for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 						it.next().onMotd(irc, motd);
 					}
