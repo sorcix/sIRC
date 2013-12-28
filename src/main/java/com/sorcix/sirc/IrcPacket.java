@@ -149,7 +149,7 @@ public final class IrcPacket {
 	 * @param message
 	 *            The message, or {@code null}.
 	 */
-	protected IrcPacket(final String prefix, final String command,
+	public IrcPacket(final String prefix, final String command,
 			final String arguments, final String message) {
 		this.prefix = prefix;
 		this.command = command;
