@@ -872,7 +872,6 @@ public class IrcConnection {
 			if (username != null) {
 				if (state.getClient() == null) {
 					state.setClient(new User(null, username, null, realname, this));
-					return;
 				}
 			}
 		}
