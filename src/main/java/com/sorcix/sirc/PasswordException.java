@@ -28,7 +28,7 @@
 package com.sorcix.sirc;
 
 /**
- * Thrown when the nickname is already in use.
+ * Thrown when the server password was wrong.
  */
 public final class PasswordException extends Exception {
 	
