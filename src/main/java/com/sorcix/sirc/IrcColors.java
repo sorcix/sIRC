@@ -46,7 +46,7 @@ package com.sorcix.sirc;
  * </pre>
  * <p>
  * The mIRC website provides documentation on the color code syntax.
- * {@link "http://www.mirc.com/help/color.txt"}
+ * @see <a href="http://www.mirc.com/help/color.txt">mIRC Colours</a>
  * </p>
  * 
  * @author Sorcix
