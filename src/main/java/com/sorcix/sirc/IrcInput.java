@@ -110,9 +110,11 @@ final class IrcInput extends Thread {
 				// always respond to PING
 				if (line.startsWith("PING ")) {
 					this.irc.out.pong(line.substring(5));
-				} else {
+				} else if (!line.trim().isEmpty()){
 					this.handleLine(line);
-				}
+				} else {
+                    IrcDebug.log("*** Invalid line from server, ignoring");
+                }
 			}
 		} catch (final SocketException ex) {
 			this.irc.setConnected(false);
