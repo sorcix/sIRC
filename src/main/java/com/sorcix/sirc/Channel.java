@@ -383,8 +383,8 @@ public final class Channel {
 		if (this.users != null) {
 			final User user = this.users.remove(old);
 			if (user != null) {
-			  user.setNick(neww);
-			  this.users.put(user.getNickLower(), user);
+			    user.setNick(neww);
+			    this.users.put(user.getNickLower(), user);
 			}
 		}
 	}
