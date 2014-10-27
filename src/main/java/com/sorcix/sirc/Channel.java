@@ -382,8 +382,10 @@ public final class Channel {
 	protected void renameUser(final String old, final String neww) {
 		if (this.users != null) {
 			final User user = this.users.remove(old);
-			user.setNick(neww);
-			this.users.put(user.getNickLower(), user);
+			if (user != null) {
+			  user.setNick(neww);
+			  this.users.put(user.getNickLower(), user);
+			}
 		}
 	}
 	
