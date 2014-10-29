@@ -29,7 +29,6 @@ package com.sorcix.sirc;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Represents a channel on the IRC server.
@@ -45,7 +44,7 @@ public final class Channel {
 	/** The topic of this channel. */
 	private String topic;
 	/** The user list. */
-	private Map<String, User> users;
+	private ConcurrentHashMap<String, User> users;
 	/** Possible channel prefixes. */
 	public static final String CHANNEL_PREFIX = "#&+!";
 	
@@ -383,8 +382,8 @@ public final class Channel {
 		if (this.users != null) {
 			final User user = this.users.remove(old);
 			if (user != null) {
-			    user.setNick(neww);
-			    this.users.put(user.getNickLower(), user);
+				user.setNick(neww);
+				this.users.put(user.getNickLower(), user);
 			}
 		}
 	}
