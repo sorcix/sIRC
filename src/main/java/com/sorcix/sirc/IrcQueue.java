@@ -27,7 +27,7 @@
  */
 package com.sorcix.sirc;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 
 /**
  * Outgoing message queue.
@@ -37,13 +37,13 @@ import java.util.LinkedList;
 final class IrcQueue {
 	
 	/** Message Queue. */
-	private final LinkedList<String> queue;
+	private final ArrayDeque<String> queue;
 	
 	/**
 	 * Creates a new outgoing message queue.
 	 */
 	protected IrcQueue() {
-		this.queue = new LinkedList<String>();
+		this.queue = new ArrayDeque<String>(8);
 	}
 	
 	/**
