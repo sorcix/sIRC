@@ -27,6 +27,8 @@
  */
 package com.sorcix.sirc;
 
+import com.sorcix.sirc.cap.CapNegotiator;
+
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -60,6 +62,8 @@ public class IrcConnection {
 	public static final String VERSION = "1.1.6-SNAPSHOT";
 	/** Advanced listener. */
 	private AdvancedListener advancedListener = null;
+
+    private CapNegotiator.Listener capNegotiatorListener = null;
 	/** Connection InputStream thread. */
 	private IrcInput in = null;
 	/** Outgoing message delay. (Flood control) */
@@ -234,7 +238,7 @@ public class IrcConnection {
 	 * @param channel
 	 *            The channel to request the userlist for.
 	 */
-	protected void askNames(final Channel channel) {
+	public void askNames(final Channel channel) {
 		this.out.send(IrcPacketFactory.createNAMES(channel.getName()));
 	}
 
@@ -369,10 +373,17 @@ public class IrcConnection {
 			this.socket = sock;
 			reconnecting = false;
 		}
-		// open streams
+        // open streams
 		this.out = new IrcOutput(this, new OutputStreamWriter(this.socket.getOutputStream(), this.charset));
 		this.in = new IrcInput(this, new InputStreamReader(this.socket.getInputStream(), this.charset));
+        CapNegotiator capNegotiator = new CapNegotiator(out);
+        if (capNegotiatorListener != null)
+            capNegotiator.addListener(capNegotiatorListener);
 		if (!reconnecting) {
+            // start capability negotiation
+            if (capNegotiatorListener != null) {
+                this.out.sendNowEx(IrcPacketFactory.createCAPLS());
+            }
 			// send password if given
 			if (this.server.getPassword() != null) {
 				this.out.sendNowEx(IrcPacketFactory.createPASS(this.server
@@ -388,10 +399,14 @@ public class IrcConnection {
 		loop: while ((line = this.in.getReader().readLine()) != null) {
 			IrcDebug.log(line);
 			final IrcPacket decoder = new IrcPacket(line, this);
-			if (decoder.isNumeric()) {
+            if (capNegotiator.isNegotiating()) {
+                capNegotiator.process(decoder);
+            }
+            if (decoder.isNumeric()) {
 				final int command = decoder.getNumericCommand();
 				switch (command) {
 				case 1:
+                    capNegotiator.cancel();
 				case 2:
 				case 3: {
 						final String nick = decoder.getArgumentsArray()[0];
@@ -411,7 +426,9 @@ public class IrcConnection {
 						throw new PasswordException("Invalid password");
 					} // break; unnecessary due to throw
 				}
-			}
+			} else if ("CAP".equals(decoder.getCommand())) {
+                capNegotiator.process(decoder);
+            }
 			if (line.startsWith("PING ")) {
 				this.out.pong(line.substring(5));
 			}
@@ -779,6 +796,10 @@ public class IrcConnection {
 	public void setAdvancedListener(final AdvancedListener listener) {
 		this.advancedListener = listener;
 	}
+
+    public void setCapNegotiatorListener(final CapNegotiator.Listener listener) {
+        this.capNegotiatorListener = listener;
+    }
 
 	/**
 	 * Marks you as away on the server. If any user sends a message to you while

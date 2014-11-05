@@ -36,7 +36,7 @@ import java.io.Writer;
  * 
  * @author Sorcix
  */
-class IrcOutput extends Thread {
+public class IrcOutput extends Thread {
 	
 	/** The IrcConnection. */
 	private final IrcConnection irc;
@@ -171,7 +171,7 @@ class IrcOutput extends Thread {
 	 * @throws IOException If anything goes wrong while sending this
 	 *             message.
 	 */
-	protected synchronized void sendNowEx(final IrcPacket packet) throws IOException {
+	public synchronized void sendNowEx(final IrcPacket packet) throws IOException {
 		this.sendNowEx(packet.getRaw());
 	}
 	
@@ -183,7 +183,7 @@ class IrcOutput extends Thread {
 	 * @throws IOException If anything goes wrong while sending this
 	 *             message.
 	 */
-	private synchronized void sendNowEx(String line) throws IOException {
+	public synchronized void sendNowEx(String line) throws IOException {
 		if (line.length() > (IrcOutput.MAX_LINE_LENGTH - 2)) {
 			line = line.substring(0, IrcOutput.MAX_LINE_LENGTH - 2);
 		}

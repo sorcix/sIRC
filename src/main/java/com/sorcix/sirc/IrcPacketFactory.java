@@ -31,4 +31,15 @@ public final class IrcPacketFactory {
 		return new IrcPacket(null, "USER", username + " Sorcix.com *", realname);
 	}
 
+    public static IrcPacket createCAPLS() {
+        return new IrcPacket(null, "CAP", "LS", null);
+    }
+
+    public static IrcPacket createCAPEND() {
+        return new IrcPacket(null, "CAP", "END", null);
+    }
+    public static IrcPacket createCAPREQ(final String features) {
+        return new IrcPacket(null, "CAP", "REQ", features);
+    }
+
 }

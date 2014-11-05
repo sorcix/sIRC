@@ -47,7 +47,7 @@ public final class Channel {
 	/** The user list. */
 	private Map<String, User> users;
 	/** Possible channel prefixes. */
-	protected static final String CHANNEL_PREFIX = "#&+!";
+	public static final String CHANNEL_PREFIX = "#&+!";
 	
 	/**
 	 * Creates a new {@code Channel} object with given name.
@@ -57,7 +57,7 @@ public final class Channel {
 	 *            channel.
 	 * @param global Whether this object is going to be shared.
 	 */
-	protected Channel(final String name, final IrcConnection irc, final boolean global) {
+	public Channel(final String name, final IrcConnection irc, final boolean global) {
 		this.name = name;
 		this.irc = irc;
 		if (global) {
@@ -72,7 +72,7 @@ public final class Channel {
 	 * 
 	 * @param user The user to add.
 	 */
-	protected void addUser(final User user) {
+	public void addUser(final User user) {
 		if ((this.users != null) && !this.users.containsKey(user.getNickLower())) {
 			this.users.put(user.getNickLower(), user);
 		}
@@ -358,7 +358,7 @@ public final class Channel {
 	 * 
 	 * @param user The user to remove.
 	 */
-	protected void removeUser(final User user) {
+	public void removeUser(final User user) {
 		if ((this.users != null) && this.users.containsKey(user.getNickLower())) {
 			this.users.remove(user.getNickLower());
 		}
@@ -501,7 +501,7 @@ public final class Channel {
 	 *            didn't exist.
 	 * @return The updated shared User object.
 	 */
-	protected User updateUser(final User user, final boolean createNew) {
+	public User updateUser(final User user, final boolean createNew) {
 		if (this.hasUser(user.getNickLower())) {
 			// update user if it exists
 			final User shared = this.getUser(user.getNickLower());
