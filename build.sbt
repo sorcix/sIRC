@@ -35,3 +35,8 @@ pomExtra :=
 licenses := Seq("BSD-style" -> url("http://www.opensource.org/licenses/bsd-license.php"))
 
 homepage := Some(url("https://github.com/pfn/sIRC"))
+
+libraryDependencies ++= Seq(
+  "com.novocode" % "junit-interface" % "0.11" % "test",
+  "org.mockito" % "mockito-core" % "1.8.5" % "test"
+)
