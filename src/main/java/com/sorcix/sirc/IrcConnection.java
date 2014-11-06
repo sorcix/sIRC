@@ -176,6 +176,18 @@ public class IrcConnection {
 		}
 	}
 
+    /**
+     * Adds a message listener to this IrcConnection.
+     *
+     * @param listener
+     *            The message listener to add.
+     */
+    public void addMessageEventListener(final MessageEventListener listener) {
+        if ((listener != null) && !this.messageEventListeners.contains(listener)) {
+            this.messageEventListeners.add(listener);
+        }
+    }
+
 	/**
 	 * Adds a mode listener to this IrcConnection. Note that adding mode
 	 * listeners will cause sIRC to check every incoming mode change for
@@ -204,7 +216,19 @@ public class IrcConnection {
 		}
 	}
 
-	/**
+    /**
+     * Adds a server listener to this IrcConnection.
+     *
+     * @param listener
+     *            The server listener to add.
+     */
+    public void addServerEventListener(final ServerEventListener listener) {
+        if ((listener != null) && !this.serverEventListeners.contains(listener)) {
+            this.serverEventListeners.add(listener);
+        }
+    }
+
+    /**
 	 * Add and load a service. {@code IrcConnection} will call the
 	 * {@link SIRCService#load(IrcConnection)} method of this
 	 * {@code SIRCService} after adding it to the service list.

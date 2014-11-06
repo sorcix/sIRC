@@ -10,6 +10,9 @@ import org.mockito.Mock;
 import static org.junit.Assert.*;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Calendar;
+import java.util.Date;
+
 @RunWith(MockitoJUnitRunner.class)
 public class IrcPacketTest {
     @Mock
@@ -60,6 +63,11 @@ public class IrcPacketTest {
                 "irc.choopa.net 001 pfn :" +
                 "Welcome to the EFNet Internet Relay Chat Network pfn",
                 connection);
+        Date ts = p.getTimestamp();
+        assertEquals(1410795191232l, p.getTime());
+        Calendar c = Calendar.getInstance();
+        c.setTime(ts);
+        assertEquals(8, c.get(Calendar.MONTH));
         assertTrue(p.isNumeric());
         assertEquals(1, p.getNumericCommand());
     }

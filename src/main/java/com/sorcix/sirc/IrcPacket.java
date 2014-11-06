@@ -80,7 +80,7 @@ public final class IrcPacket {
 	protected static final String CTCP = "\u0001";
 
     private static DateFormat dateFormat = new SimpleDateFormat(
-    );//"yyyy-MM-dd'T'HH:mm:ss.SSSX");
+            "yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
 	/**
 	 * Creates a new IrcPacket using the data from given raw IRC data.
