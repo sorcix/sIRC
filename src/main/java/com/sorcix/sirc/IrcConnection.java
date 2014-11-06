@@ -28,6 +28,8 @@
 package com.sorcix.sirc;
 
 import com.sorcix.sirc.cap.CapNegotiator;
+import com.sorcix.sirc.event.MessageEventListener;
+import com.sorcix.sirc.event.ServerEventListener;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
@@ -70,6 +72,10 @@ public class IrcConnection {
 	private int messageDelay = 100;
 	/** Message listeners. */
 	private final List<MessageListener> messageListeners;
+
+    private final List<MessageEventListener> messageEventListeners;
+    private final List<ServerEventListener> serverEventListeners;
+
 	/** Mode listeners. */
 	private final List<ModeListener> modeListeners;
 	/** Connection OutputStream thread. */
@@ -137,6 +143,8 @@ public class IrcConnection {
 	public IrcConnection(final String server, final int port,
 			final String password) {
 		this.server = new IrcServer(server, port, password, false);
+        this.serverEventListeners = new Vector<ServerEventListener>(4);
+        this.messageEventListeners = new Vector<MessageEventListener>(4);
 		this.serverListeners = new Vector<ServerListener>(4);
 		this.messageListeners = new Vector<MessageListener>(4);
 		this.modeListeners = new Vector<ModeListener>(2);
@@ -641,6 +649,14 @@ public class IrcConnection {
 	protected Iterator<ServerListener> getServerListeners() {
 		return this.serverListeners.iterator();
 	}
+
+    protected List<ServerEventListener> getServerEventListeners() {
+        return this.serverEventListeners;
+    }
+
+    protected List<MessageEventListener> getMessageEventListeners() {
+        return this.messageEventListeners;
+    }
 
 	/**
 	 * Gives the port number this {@code IrcConnection} is using to connect.

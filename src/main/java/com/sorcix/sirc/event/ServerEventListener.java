@@ -199,16 +199,6 @@ public interface ServerEventListener {
 	void onMode(Mode mode);
 
 	/**
-	 * The server sent the Message of the Day.
-	 *
-	 * @param irc The {@link com.sorcix.sirc.IrcConnection} receiving this event.
-	 * @param motd The message of the day.
-	 * @see com.sorcix.sirc.IrcConnection#askMotd()
-	 * @since 1.0.2
-	 */
-	void onMotd(IrcConnection irc, String motd);
-
-	/**
 	 * Someone (possibly us) changed his nickname. Note that the
 	 * {@code oldUser} can not be used to send messages, as that
 	 * nickname no longer exists.

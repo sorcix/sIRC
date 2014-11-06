@@ -27,6 +27,9 @@
  */
 package com.sorcix.sirc;
 
+import com.sorcix.sirc.event.MessageEventListener;
+import com.sorcix.sirc.event.ServerEventListener;
+
 import java.util.Date;
 import java.util.Iterator;
 
@@ -51,6 +54,9 @@ final class IrcParser {
 			if (line.isCtcp()) {
 				// reply to CTCP commands
 				if (line.getMessage().startsWith("ACTION ")) {
+                    for (MessageEventListener l : irc.getMessageEventListeners()) {
+                        l.onAction(new MessageEventListener.Action(irc, line));
+                    }
 					if (Channel.CHANNEL_PREFIX.indexOf(line.getArguments().charAt(0)) >= 0) {
 						// to channel
 						final Channel chan = irc.getState().getChannel(line.getArguments());
@@ -88,6 +94,9 @@ final class IrcParser {
 			} else if (line.getArguments().startsWith("#") || line.getArguments().startsWith("&")) {
 				// to channel
 				final Channel chan = irc.getState().getChannel(line.getArguments());
+                for (MessageEventListener l : irc.getMessageEventListeners()) {
+                    l.onMessage(new MessageEventListener.Message(irc, line));
+                }
 				for (final Iterator<MessageListener> it = irc.getMessageListeners(); it.hasNext();) {
 					it.next().onMessage(irc, chan.updateUser(line.getSender(), true), chan, line.getMessage());
 				}
@@ -96,6 +105,9 @@ final class IrcParser {
 				for (final Iterator<MessageListener> it = irc.getMessageListeners(); it.hasNext();) {
 					it.next().onPrivateMessage(irc, line.getSender(), line.getMessage());
 				}
+                for (MessageEventListener l : irc.getMessageEventListeners()) {
+                    l.onPrivateMessage(new MessageEventListener.Message(irc, line));
+                }
 			}
 		} else if (line.getCommand().equals("NOTICE") && (line.getArguments() != null)) {
 			if (line.isCtcp()) {
@@ -108,17 +120,26 @@ final class IrcParser {
 						it.next().onCtcpReply(irc, line.getSender(), command, args);
 					}
 				}
+                for (MessageEventListener l : irc.getMessageEventListeners()) {
+                    l.onCtcpReply(new MessageEventListener.CtcpReply(irc, line));
+                }
 			} else if (Channel.CHANNEL_PREFIX.indexOf(line.getArguments().charAt(0)) >= 0) {
 				// to channel
 				final Channel chan = irc.getState().getChannel(line.getArguments());
 				for (final Iterator<MessageListener> it = irc.getMessageListeners(); it.hasNext();) {
 					it.next().onNotice(irc, chan.updateUser(line.getSender(), true), chan, line.getMessage());
 				}
+                for (MessageEventListener l : irc.getMessageEventListeners()) {
+                    l.onNotice(new MessageEventListener.Notice(irc, line));
+                }
 			} else {
 				// to user
 				for (final Iterator<MessageListener> it = irc.getMessageListeners(); it.hasNext();) {
 					it.next().onNotice(irc, line.getSender(), line.getMessage());
 				}
+                for (MessageEventListener l : irc.getMessageEventListeners()) {
+                    l.onNotice(new MessageEventListener.Notice(irc, line));
+                }
 			}
 		} else if (line.getCommand().equals("JOIN")) {
 			// some server seem to send the joined channel as message,
@@ -141,6 +162,9 @@ final class IrcParser {
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 				it.next().onJoin(irc, irc.getState().getChannel(channel), line.getSender());
 			}
+            for (ServerEventListener l : irc.getServerEventListeners()) {
+                l.onJoin(new ServerEventListener.Join(irc, line));
+            }
 		} else if (line.getCommand().equals("PART")) {
 			// someone left a channel
 			if (line.getSender().isUs()) {
@@ -156,12 +180,18 @@ final class IrcParser {
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 				it.next().onPart(irc, irc.getState().getChannel(line.getArguments()), line.getSender(), line.getMessage());
 			}
+            for (ServerEventListener l : irc.getServerEventListeners()) {
+                l.onPart(new ServerEventListener.Part(irc, line));
+            }
 		} else if (line.getCommand().equals("QUIT")) {
 			// someone quit the IRC server
 			final User quitter = line.getSender();
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 				it.next().onQuit(irc, quitter, line.getMessage());
 			}
+            for (ServerEventListener l : irc.getServerEventListeners()) {
+                l.onQuit(new ServerEventListener.Quit(irc, line));
+            }
 			for (final Iterator<Channel> it = irc.getState().getChannels(); it.hasNext();) {
 				final Channel channel = it.next();
 				if (channel.hasUser(quitter)) {
@@ -184,6 +214,9 @@ final class IrcParser {
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 				it.next().onKick(irc, channel, line.getSender(), kicked, line.getMessage());
 			}
+            for (ServerEventListener l : irc.getServerEventListeners()) {
+                l.onKick(new ServerEventListener.Kick(irc, line));
+            }
 		} else if (line.getCommand().equals("MODE")) {
 			this.parseMode(irc, line);
 		} else if (line.getCommand().equals("TOPIC")) {
@@ -192,6 +225,9 @@ final class IrcParser {
 				final Channel chan = irc.getState().getChannel(line.getArguments());
 				it.next().onTopic(irc, chan, chan.updateUser(line.getSender(), false), line.getMessage());
 			}
+            for (ServerEventListener l : irc.getServerEventListeners()) {
+                l.onTopic(new ServerEventListener.Topic(irc, line));
+            }
 		} else if (line.getCommand().equals("NICK")) {
 			User newUser;
 			if (line.hasMessage()) {
@@ -210,6 +246,9 @@ final class IrcParser {
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 				it.next().onNick(irc, line.getSender(), newUser);
 			}
+            for (ServerEventListener l : irc.getServerEventListeners()) {
+                l.onNick(new ServerEventListener.Nick(irc, line));
+            }
 		} else if (line.getCommand().equals("INVITE")) {
 			// someone was invited
 			final String[] args = line.getArgumentsArray();
@@ -218,6 +257,9 @@ final class IrcParser {
 				for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 					it.next().onInvite(irc, line.getSender(), new User(args[0], irc), channel);
 				}
+                for (ServerEventListener l : irc.getServerEventListeners()) {
+                    l.onInvite(new ServerEventListener.Invite(irc, line));
+                }
 			}
 		} else {
 			if (irc.getAdvancedListener() != null) {
@@ -239,6 +281,9 @@ final class IrcParser {
 			for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 				it.next().onMode(irc, irc.getState().getChannel(args[0]), line.getSender(), line.getArguments().substring(args[0].length() + 1));
 			}
+            for (ServerEventListener l : irc.getServerEventListeners()) {
+                l.onMode(new ServerEventListener.Mode(irc, line));
+            }
 			if ((args.length >= 3)) {
 				final Channel channel = irc.getState().getChannel(args[0]);
 				final String mode = args[1];
@@ -327,6 +372,9 @@ final class IrcParser {
 				for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 					it.next().onTopic(irc, irc.getState().getChannel(line.getArgumentsArray()[1]), null, line.getMessage());
 				}
+                for (ServerEventListener l : irc.getServerEventListeners()) {
+                    l.onTopic(new ServerEventListener.Topic(irc, line));
+                }
 				break;
 			case IrcPacket.RPL_NAMREPLY:
 				final String[] arguments = line.getArgumentsArray();
