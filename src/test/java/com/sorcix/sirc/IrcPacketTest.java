@@ -64,10 +64,13 @@ public class IrcPacketTest {
                 "Welcome to the EFNet Internet Relay Chat Network pfn",
                 connection);
         Date ts = p.getTimestamp();
+        assertEquals(new Date(1410795191232l), p.getTimestamp());
         assertEquals(1410795191232l, p.getTime());
         Calendar c = Calendar.getInstance();
         c.setTime(ts);
         assertEquals(8, c.get(Calendar.MONTH));
+        // only works in GMT-7
+//        assertEquals(8, c.get(Calendar.HOUR));
         assertTrue(p.isNumeric());
         assertEquals(1, p.getNumericCommand());
     }

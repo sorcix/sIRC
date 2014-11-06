@@ -31,6 +31,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Parses a raw server response into a more readable format.
@@ -79,8 +80,22 @@ public final class IrcPacket {
 	/** CTCP message mark. */
 	protected static final String CTCP = "\u0001";
 
-    private static DateFormat dateFormat = new SimpleDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss.SSSX");
+    private final static DateFormat dateFormat;
+
+    static {
+
+        SimpleDateFormat sdf = null;
+        try {
+            sdf = new SimpleDateFormat(
+                    "yyyy-MM-dd'T'HH:mm:ss.SSSX");
+        } catch (IllegalArgumentException e) {
+            // android fallback, it does not support 'X'
+            sdf = new SimpleDateFormat(
+                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        }
+        dateFormat = sdf;
+    }
 
 	/**
 	 * Creates a new IrcPacket using the data from given raw IRC data.
