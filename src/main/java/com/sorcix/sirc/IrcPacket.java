@@ -110,8 +110,10 @@ public final class IrcPacket {
             int endTime = line.indexOf(" ");
             if (endTime > 0) {
                 try {
-                    timestamp = dateFormat.parse(
-                            line.substring(6 /* @time= */, endTime));
+                    synchronized (dateFormat) {
+                        timestamp = dateFormat.parse(
+                                line.substring(6 /* @time= */, endTime));
+                    }
                 } catch (ParseException e) {
                     // ignore
                     timestamp = new Date();
