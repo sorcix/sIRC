@@ -31,7 +31,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.SocketException;
-import java.util.Iterator;
 
 /**
  * Input Thread.
@@ -127,8 +126,6 @@ final class IrcInput extends Thread {
 		// close connections
 		this.irc.disconnect();
 		// send disconnect event
-		for (final Iterator<ServerListener> it = this.irc.getServerListeners(); it.hasNext();) {
-			it.next().onDisconnect(this.irc);
-		}
+		this.irc.invokeServerListeners().onDisconnect(this.irc);
 	}
 }

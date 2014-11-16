@@ -29,6 +29,9 @@ package com.sorcix.sirc;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
+
+import org.threadly.concurrent.event.ListenerHelper;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -65,13 +68,13 @@ public class IrcConnection {
 	/** Outgoing message delay. (Flood control) */
 	private int messageDelay = 100;
 	/** Message listeners. */
-	private final List<MessageListener> messageListeners;
+	private final ListenerHelper<MessageListener> messageListeners;
 	/** Mode listeners. */
-	private final List<ModeListener> modeListeners;
+	private final ListenerHelper<ModeListener> modeListeners;
 	/** Connection OutputStream thread. */
 	protected IrcOutput out = null;
 	/** Server listeners. */
-	private final List<ServerListener> serverListeners;
+	private final ListenerHelper<ServerListener> serverListeners;
 	/** Services. */
 	private final List<SIRCService> services;
 	/** Connection socket. */
@@ -133,9 +136,9 @@ public class IrcConnection {
 	public IrcConnection(final String server, final int port,
 			final String password) {
 		this.server = new IrcServer(server, port, password, false);
-		this.serverListeners = new Vector<ServerListener>(4);
-		this.messageListeners = new Vector<MessageListener>(4);
-		this.modeListeners = new Vector<ModeListener>(2);
+		this.serverListeners = ListenerHelper.build(ServerListener.class);
+		this.messageListeners = ListenerHelper.build(MessageListener.class);
+		this.modeListeners = ListenerHelper.build(ModeListener.class);
 		this.services = new Vector<SIRCService>(0);
 		this.state = new ClientState();
 	}
@@ -159,9 +162,7 @@ public class IrcConnection {
 	 *            The message listener to add.
 	 */
 	public void addMessageListener(final MessageListener listener) {
-		if ((listener != null) && !this.messageListeners.contains(listener)) {
-			this.messageListeners.add(listener);
-		}
+		this.messageListeners.addListener(listener);
 	}
 
 	/**
@@ -175,9 +176,7 @@ public class IrcConnection {
 	 *            The mode listener to add.
 	 */
 	public void addModeListener(final ModeListener listener) {
-		if ((listener != null) && !this.modeListeners.contains(listener)) {
-			this.modeListeners.add(listener);
-		}
+		this.modeListeners.addListener(listener);
 	}
 
 	/**
@@ -187,9 +186,7 @@ public class IrcConnection {
 	 *            The server listener to add.
 	 */
 	public void addServerListener(final ServerListener listener) {
-		if ((listener != null) && !this.serverListeners.contains(listener)) {
-			this.serverListeners.add(listener);
-		}
+		this.serverListeners.addListener(listener);
 	}
 
 	/**
@@ -422,10 +419,7 @@ public class IrcConnection {
 		// we are connected
 		this.setConnected(true);
 		// send events
-		for (final Iterator<ServerListener> it = this.getServerListeners(); it
-				.hasNext();) {
-			it.next().onConnect(this);
-		}
+		this.serverListeners.call().onConnect(this);
 	}
 
 	/**
@@ -570,21 +564,23 @@ public class IrcConnection {
 	}
 
 	/**
-	 * Returns all {@link MessageListener}s registered with this IrcConnection.
+	 * Returns an instance of {@link MessageListener} to which you can invoke
+	 * a call on all listeners registered with this instance of IrcConnection.
 	 * 
-	 * @return All {@code MessageListeners}.
+	 * @return Implementation of {@code MessageListeners} to invoke.
 	 */
-	protected Iterator<MessageListener> getMessageListeners() {
-		return this.messageListeners.iterator();
+	protected MessageListener invokeMessageListeners() {
+		return this.messageListeners.call();
 	}
 
 	/**
-	 * Returns all {@link ModeListener}s registered with this IrcConnection.
+	 * Returns an instance of {@link ModeListener} to which you can invoke
+	 * a call on all listeners registered with this instance of IrcConnection.
 	 * 
-	 * @return All {@code ModeListeners}.
+	 * @return Implementation of {@code ModeListeners} to invoke.
 	 */
-	protected Iterator<ModeListener> getModeListeners() {
-		return this.modeListeners.iterator();
+	protected ModeListener invokeModeListeners() {
+		return this.modeListeners.call();
 	}
 
 	/**
@@ -617,12 +613,13 @@ public class IrcConnection {
 	}
 
 	/**
-	 * Returns all {@link ServerListener}s registered with this IrcConnection.
+	 * Returns an instance of {@link ServerListener} to which you can invoke
+	 * a call on all listeners registered with this instance of IrcConnection.
 	 * 
-	 * @return All {@code ServerListeners}.
+	 * @return Implementation of {@code ServerListeners} to invoke.
 	 */
-	protected Iterator<ServerListener> getServerListeners() {
-		return this.serverListeners.iterator();
+	protected ServerListener invokeServerListeners() {
+		return this.serverListeners.call();
 	}
 
 	/**
@@ -726,9 +723,7 @@ public class IrcConnection {
 	 *            The message listener to remove.
 	 */
 	public void removeMessageListener(final MessageListener listener) {
-		if ((listener != null) && this.messageListeners.contains(listener)) {
-			this.messageListeners.remove(listener);
-		}
+		this.messageListeners.removeListener(listener);
 	}
 
 	/**
@@ -738,9 +733,7 @@ public class IrcConnection {
 	 *            The mode listener to remove.
 	 */
 	public void removeModeListener(final ModeListener listener) {
-		if ((listener != null) && this.modeListeners.contains(listener)) {
-			this.modeListeners.remove(listener);
-		}
+		this.modeListeners.removeListener(listener);
 	}
 
 	/**
@@ -750,9 +743,7 @@ public class IrcConnection {
 	 *            The server listener to remove.
 	 */
 	public void removeServerListener(final ServerListener listener) {
-		if ((listener != null) && this.serverListeners.contains(listener)) {
-			this.serverListeners.remove(listener);
-		}
+		this.serverListeners.removeListener(listener);
 	}
 
 	/**
