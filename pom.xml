@@ -44,7 +44,7 @@
     <dependencies>
         <dependency>
             <groupId>org.threadly</groupId>
-            <artifactId>threadly</threadly>
+            <artifactId>threadly</artifactId>
             <version>3.2.0</version>
         </dependency>
         <dependency>
