@@ -812,6 +812,18 @@ public class IrcConnection {
 		}
 	}
 
+	public void removeServerEventListener(final ServerEventListener listener) {
+		if ((listener != null) && this.serverEventListeners.contains(listener)) {
+			this.serverEventListeners.remove(listener);
+		}
+	}
+
+	public void removeMessageEventListener(final MessageEventListener listener) {
+		if ((listener != null) && this.messageEventListeners.contains(listener)) {
+			this.messageEventListeners.remove(listener);
+		}
+	}
+
 	/**
 	 * Remove a service. {@code IrcConnection} will call the
 	 * {@link SIRCService#unload(IrcConnection)} method of this
