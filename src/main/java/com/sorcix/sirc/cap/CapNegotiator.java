@@ -62,12 +62,12 @@ public class CapNegotiator {
             String command = args[1];
             if ("ACK".equals(command)) {
                 for (Listener l : listeners) {
-                    if (!l.onNegotiateFeature(this, packet.getMessage()))
+                    if (!l.onNegotiateFeature(this, packet.getMessage().trim()))
                         listeners.remove(l);
                 }
             } else if ("NAK".equals(command)) {
                 for (Listener l : listeners) {
-                    l.onNegotiateMissing(this, packet.getMessage());
+                    l.onNegotiateMissing(this, packet.getMessage().trim());
                     listeners.remove(l);
                 }
             } else if ("LS".equals(command)) {

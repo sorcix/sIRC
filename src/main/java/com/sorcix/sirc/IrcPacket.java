@@ -46,6 +46,7 @@ import java.util.TimeZone;
 public final class IrcPacket {
 
     private Date timestamp = null;
+	private String rawLine = null;
 
 	/** Arguments separated by a space */
 	private String arguments = null;
@@ -106,6 +107,7 @@ public final class IrcPacket {
 	 *            The IrcConnection used to send messages.
 	 */
 	protected IrcPacket(String line, final IrcConnection irc) {
+		rawLine = line;
         if (line.startsWith("@time=")) {
             int endTime = line.indexOf(" ");
             if (endTime > 0) {
@@ -140,6 +142,7 @@ public final class IrcPacket {
 		}
 		// space between command and receiver
 		final int locArgs = line.indexOf(' ', locCommand + 1);
+		if (locArgs < 0) return; // rawLine only packet
 		// retrieve command
 		this.command = line.substring(locCommand + 1, locArgs);
 		// colon between arguments and message
@@ -277,6 +280,7 @@ public final class IrcPacket {
 	 * @return IRC String containing the data in this object.
 	 */
 	public String getRaw() {
+		if (rawLine != null) return rawLine;
 		final StringBuffer buffer = new StringBuffer();
 
 		if ((this.prefix != null) && (this.prefix.length() > 0)) {

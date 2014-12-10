@@ -458,7 +458,7 @@ public class IrcConnection {
 						throw new PasswordException("Invalid password");
 					} // break; unnecessary due to throw
 				}
-			} else if ("CAP".equals(decoder.getCommand())) {
+			} else if ("CAP".equals(decoder.getCommand()) && !capNegotiator.isNegotiating()) {
                 capNegotiator.process(decoder);
             }
 			if (line.startsWith("PING ")) {
