@@ -71,7 +71,7 @@ public final class Channel {
 	 * 
 	 * @param user The user to add.
 	 */
-	protected void addUser(final User user) {
+	public void addUser(final User user) {
 		if (this.users != null) {
 			this.users.putIfAbsent(user.getNickLower(), user);
 		}
@@ -357,7 +357,7 @@ public final class Channel {
 	 * 
 	 * @param user The user to remove.
 	 */
-	protected void removeUser(final User user) {
+	public void removeUser(final User user) {
 		if (this.users != null) {
 			this.users.remove(user.getNickLower());
 		}
