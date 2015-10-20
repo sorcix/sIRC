@@ -407,6 +407,9 @@ final class IrcParser {
 					for (final Iterator<ServerListener> it = irc.getServerListeners(); it.hasNext();) {
 						it.next().onMotd(irc, motd);
 					}
+					for (ServerEventListener l : irc.getServerEventListeners()) {
+						l.onMotd(new ServerEventListener.Motd(irc, line, motd));
+					}
 				}
 				break;
 			case IrcPacket.RPL_BOUNCE:

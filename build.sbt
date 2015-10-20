@@ -1,5 +1,15 @@
 name := "sirc"
 
+autoScalaLibrary := false
+
+javacOptions in Compile ++= Seq("-target", "1.6", "-source", "1.6")
+
+javacOptions in (Compile,doc) ~= {
+  _.foldRight(List.empty[String]) { case (o,r) =>
+    if (o != "-target") o :: r else r.drop(1)
+  }
+}
+
 crossPaths := false
 
 organization := "com.hanhuy"

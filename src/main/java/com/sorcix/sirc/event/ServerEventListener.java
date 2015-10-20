@@ -100,6 +100,13 @@ public interface ServerEventListener {
         }
     }
 
+    public static class Motd extends BaseEvent {
+        public final String motd;
+        public Motd(IrcConnection c, IrcPacket p, String motd) {
+            super(c, p);
+            this.motd = motd;
+        }
+    }
     public static class Mode extends BaseEvent {
         public final Channel channel;
         public final User sender;
@@ -232,4 +239,10 @@ public interface ServerEventListener {
 	 * joining.
 	 */
 	void onTopic(Topic topic);
+
+    void onMotd(Motd motd);
+
+    void onConnect(IrcConnection c);
+
+    void onDisconnect(IrcConnection c);
 }

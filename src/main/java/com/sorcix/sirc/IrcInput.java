@@ -27,6 +27,8 @@
  */
 package com.sorcix.sirc;
 
+import com.sorcix.sirc.event.ServerEventListener;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -132,5 +134,7 @@ final class IrcInput extends Thread {
 		for (final Iterator<ServerListener> it = this.irc.getServerListeners(); it.hasNext();) {
 			it.next().onDisconnect(this.irc);
 		}
+		for (ServerEventListener l : irc.getServerEventListeners())
+			l.onDisconnect(irc);
 	}
 }

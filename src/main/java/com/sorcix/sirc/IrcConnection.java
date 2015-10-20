@@ -475,6 +475,9 @@ public class IrcConnection {
 				.hasNext();) {
 			it.next().onConnect(this);
 		}
+		for (ServerEventListener l : serverEventListeners) {
+			l.onConnect(this);
+		}
 	}
 
 	/**
