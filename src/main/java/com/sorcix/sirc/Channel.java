@@ -29,7 +29,6 @@ package com.sorcix.sirc;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Represents a channel on the IRC server.
@@ -45,7 +44,7 @@ public final class Channel {
 	/** The topic of this channel. */
 	private String topic;
 	/** The user list. */
-	private Map<String, User> users;
+	private ConcurrentHashMap<String, User> users;
 	/** Possible channel prefixes. */
 	public static final String CHANNEL_PREFIX = "#&+!";
 	
@@ -72,9 +71,9 @@ public final class Channel {
 	 * 
 	 * @param user The user to add.
 	 */
-	public void addUser(final User user) {
-		if ((this.users != null) && !this.users.containsKey(user.getNickLower())) {
-			this.users.put(user.getNickLower(), user);
+	protected void addUser(final User user) {
+		if (this.users != null) {
+			this.users.putIfAbsent(user.getNickLower(), user);
 		}
 	}
 	
@@ -358,8 +357,8 @@ public final class Channel {
 	 * 
 	 * @param user The user to remove.
 	 */
-	public void removeUser(final User user) {
-		if ((this.users != null) && this.users.containsKey(user.getNickLower())) {
+	protected void removeUser(final User user) {
+		if (this.users != null) {
 			this.users.remove(user.getNickLower());
 		}
 	}
@@ -380,11 +379,12 @@ public final class Channel {
 	 * @param neww The new nickname.
 	 */
 	protected void renameUser(final String old, final String neww) {
-		if ((this.users != null) && this.users.containsKey(old)) {
-			final User user = this.users.get(old);
-			this.users.remove(old);
-			user.setNick(neww);
-			this.users.put(user.getNickLower(), user);
+		if (this.users != null) {
+			final User user = this.users.remove(old);
+			if (user != null) {
+				user.setNick(neww);
+				this.users.put(user.getNickLower(), user);
+			}
 		}
 	}
 	
