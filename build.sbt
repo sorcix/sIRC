@@ -4,7 +4,7 @@ crossPaths := false
 
 organization := "com.hanhuy"
 
-version := "1.1.6-SNAPSHOT"
+version := "1.1.6-pfn"
 
 // sonatype publishing options follow
 publishMavenStyle := true
