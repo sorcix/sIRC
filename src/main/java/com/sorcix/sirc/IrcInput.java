@@ -108,14 +108,14 @@ final class IrcInput extends Thread {
 		try {
 			// wait for lines to come in
 			while ((line = this.in.readLine()) != null) {
-				IrcDebug.log("<<< " + line);
+				IrcDebug.log(irc + " <<< " + line);
 				// always respond to PING
 				if (line.startsWith("PING ")) {
 					this.irc.out.pong(line.substring(5));
 				} else if (!line.trim().isEmpty()){
 					this.handleLine(line);
 				} else {
-                    IrcDebug.log("*** Invalid line from server, ignoring");
+                    IrcDebug.log(irc + ": *** Invalid line from server, ignoring");
                 }
 			}
 		} catch (final SocketException ex) {
@@ -123,7 +123,7 @@ final class IrcInput extends Thread {
 		} catch (final IOException ex) {
 			this.irc.setConnected(false);
 		} catch (final Exception ex) {
-			IrcDebug.log("Exception " + ex + " on: " + line);
+			IrcDebug.log(irc + ": Exception " + ex + " on: " + line);
 			ex.printStackTrace();
 		}
 		// when reaching this, we are disconnected

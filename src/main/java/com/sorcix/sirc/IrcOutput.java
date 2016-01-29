@@ -187,7 +187,7 @@ public class IrcOutput extends Thread {
 		if (line.length() > (IrcOutput.MAX_LINE_LENGTH - 2)) {
 			line = line.substring(0, IrcOutput.MAX_LINE_LENGTH - 2);
 		}
-		IrcDebug.log(">>> " + line);
+		IrcDebug.log(irc + " >>> " + line);
 		this.out.write(line + IrcConnection.ENDLINE);
 		this.out.flush();
 	}
