@@ -47,7 +47,7 @@ public interface MessageEventListener {
             action = p.getMessage().substring(7);
             if (Channel.CHANNEL_PREFIX.indexOf(p.getArguments().charAt(0)) >= 0) {
                 // to channel
-                target = c.getState().getChannel(p.getArguments());
+                target = c.getState().getChannel(p.getArgumentsArray()[0]);
                 sender = target.updateUser(p.getSender(), true);
             } else {
                 // to user
@@ -81,7 +81,7 @@ public interface MessageEventListener {
             message = p.getMessage();
             if (Channel.CHANNEL_PREFIX.indexOf(
                     p.getArguments().charAt(0)) >= 0) {
-                target = c.getState().getChannel(p.getArguments());
+                target = c.getState().getChannel(p.getArgumentsArray()[0]);
                 sender = target.updateUser(p.getSender(), true);
             } else {
                 target = null;
@@ -99,7 +99,7 @@ public interface MessageEventListener {
             message = p.getMessage();
             if (Channel.CHANNEL_PREFIX.indexOf(
                     p.getArguments().charAt(0)) >= 0) {
-                target = c.getState().getChannel(p.getArguments());
+                target = c.getState().getChannel(p.getArgumentsArray()[0]);
                 sender = target.updateUser(p.getSender(), true);
             } else {
                 target = null;

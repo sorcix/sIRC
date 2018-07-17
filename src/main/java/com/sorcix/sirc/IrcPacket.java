@@ -164,7 +164,13 @@ public final class IrcPacket {
 				this.message = this.message.substring(1,
 						this.message.length() - 1);
 			}
-		}
+		} else {
+                        // broken PRIVMSG with 1 message word and no colon: thelounge
+                        String[] args = getArgumentsArray();
+                        if (args.length > 1) {
+                                this.message = args[args.length - 1];
+                        }
+                }
 		// check if the command is a server reply
 		this.cmdNumeric = this.getInteger(this.command);
 		if (this.cmdNumeric != -1) {
