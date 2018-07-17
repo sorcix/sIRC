@@ -27,6 +27,12 @@
  */
 package com.sorcix.sirc;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 /**
  * Parses a raw server response into a more readable format.
  * 
@@ -38,6 +44,9 @@ package com.sorcix.sirc;
  * @see AdvancedListener
  */
 public final class IrcPacket {
+
+    private Date timestamp = null;
+	private String rawLine = null;
 
 	/** Arguments separated by a space */
 	private String arguments = null;
@@ -62,7 +71,7 @@ public final class IrcPacket {
 	/** Reply to MOTD. (message of the day) */
 	protected static final int RPL_MOTD = 372;
 	/** Response to TOPIC with the set topic. */
-	protected static final int RPL_TOPIC = 332;
+	public static final int RPL_TOPIC = 332;
 	/** Termination of an RPL_NAMREPLY list. */
 	protected static final int RPL_ENDOFNAMES = 366;
 	/** Reply to NAMES (See RFC). */
@@ -71,6 +80,23 @@ public final class IrcPacket {
 	protected static final int RPL_BOUNCE = 10;
 	/** CTCP message mark. */
 	protected static final String CTCP = "\u0001";
+
+    private final static DateFormat dateFormat;
+
+    static {
+
+        SimpleDateFormat sdf = null;
+        try {
+            sdf = new SimpleDateFormat(
+                    "yyyy-MM-dd'T'HH:mm:ss.SSSX");
+        } catch (IllegalArgumentException e) {
+            // android fallback, it does not support 'X'
+            sdf = new SimpleDateFormat(
+                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        }
+        dateFormat = sdf;
+    }
 
 	/**
 	 * Creates a new IrcPacket using the data from given raw IRC data.
@@ -81,6 +107,26 @@ public final class IrcPacket {
 	 *            The IrcConnection used to send messages.
 	 */
 	protected IrcPacket(String line, final IrcConnection irc) {
+		rawLine = line;
+        if (line.startsWith("@time=")) {
+            int endTime = line.indexOf(" ");
+            if (endTime > 0) {
+                try {
+                    synchronized (dateFormat) {
+                        timestamp = dateFormat.parse(
+                                line.substring(6 /* @time= */, endTime));
+                    }
+                } catch (ParseException e) {
+                    // ignore
+                    timestamp = new Date();
+                }
+                line = line.substring(endTime + 1);
+            } else {
+                throw new IllegalArgumentException("malformed IRC line: " + line);
+            }
+        } else {
+            timestamp = new Date();
+        }
 		line = IrcColors.remove(line);
 		final int locLineStart = line.indexOf(':') + 1;
 		int locCommand;
@@ -96,6 +142,7 @@ public final class IrcPacket {
 		}
 		// space between command and receiver
 		final int locArgs = line.indexOf(' ', locCommand + 1);
+		if (locArgs < 0) return; // rawLine only packet
 		// retrieve command
 		this.command = line.substring(locCommand + 1, locArgs);
 		// colon between arguments and message
@@ -117,7 +164,13 @@ public final class IrcPacket {
 				this.message = this.message.substring(1,
 						this.message.length() - 1);
 			}
-		}
+		} else {
+                        // broken PRIVMSG with 1 message word and no colon: thelounge
+                        String[] args = getArgumentsArray();
+                        if (args.length > 1) {
+                                this.message = args[args.length - 1];
+                        }
+                }
 		// check if the command is a server reply
 		this.cmdNumeric = this.getInteger(this.command);
 		if (this.cmdNumeric != -1) {
@@ -232,7 +285,8 @@ public final class IrcPacket {
 	 * 
 	 * @return IRC String containing the data in this object.
 	 */
-	protected String getRaw() {
+	public String getRaw() {
+		if (rawLine != null) return rawLine;
 		final StringBuffer buffer = new StringBuffer();
 
 		if ((this.prefix != null) && (this.prefix.length() > 0)) {
@@ -293,4 +347,12 @@ public final class IrcPacket {
 	public boolean isNumeric() {
 		return this.numeric;
 	}
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public long getTime() {
+        return timestamp.getTime();
+    }
 }

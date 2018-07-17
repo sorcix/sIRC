@@ -27,6 +27,8 @@
  */
 package com.sorcix.sirc;
 
+import com.sorcix.sirc.event.ServerEventListener;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -106,20 +108,22 @@ final class IrcInput extends Thread {
 		try {
 			// wait for lines to come in
 			while ((line = this.in.readLine()) != null) {
-				IrcDebug.log("<<< " + line);
+				IrcDebug.log(irc + " <<< " + line);
 				// always respond to PING
 				if (line.startsWith("PING ")) {
 					this.irc.out.pong(line.substring(5));
-				} else {
+				} else if (!line.trim().isEmpty()){
 					this.handleLine(line);
-				}
+				} else {
+                    IrcDebug.log(irc + ": *** Invalid line from server, ignoring");
+                }
 			}
 		} catch (final SocketException ex) {
 			this.irc.setConnected(false);
 		} catch (final IOException ex) {
 			this.irc.setConnected(false);
 		} catch (final Exception ex) {
-			IrcDebug.log("Exception " + ex + " on: " + line);
+			IrcDebug.log(irc + ": Exception " + ex + " on: " + line);
 			ex.printStackTrace();
 		}
 		// when reaching this, we are disconnected
@@ -130,5 +134,7 @@ final class IrcInput extends Thread {
 		for (final Iterator<ServerListener> it = this.irc.getServerListeners(); it.hasNext();) {
 			it.next().onDisconnect(this.irc);
 		}
+		for (ServerEventListener l : irc.getServerEventListeners())
+			l.onDisconnect(irc);
 	}
 }
